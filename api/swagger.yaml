@@ -1,0 +1,1122 @@
+swagger: '2.0'
+info:
+  description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
+  version: 1.0.0
+  title: e-Commerce Bookstore
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: 'localhost:8080'
+basePath: /api
+tags:
+  - name: book
+    description: Operations about books
+  - name: author
+    description: Operations about authors
+  - name: user
+    description: Operations about users
+  - name: event
+    description: Operations about events
+schemes:
+  - http
+  
+paths:
+
+  # MARK: - Books
+
+  '/books':
+  
+    get:
+      tags:
+        - book
+      summary: Returns the Books
+      operationId: getBooks
+      description: By passing in the appropriate options, you can search for available
+        inventory in the system
+      produces:
+        - application/json
+      parameters:
+        - name: ISBN
+          in: query
+          description: Pass an optional search string for looking up books
+          required: false
+          type: string
+        - name: author
+          in: query
+          description: Pass an optional search string for looking up books
+          required: false
+          type: string
+        - name: title
+          in: query
+          description: Pass an optional search string for looking up books
+          required: false
+          type: string
+        - name: release_date
+          in: query
+          description: Pass an optional search string for looking up books
+          required: false
+          type: string
+          format: date
+        - name: order_type
+          in: query
+          description: Pass an optional order in which receive the list of books (default
+            is alphabetic)
+          required: false
+          type: string
+        - name: page
+          in: query
+          description: Number of the page
+          type: integer
+          format: int32
+          minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of records to return in a single page
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        '200':
+          description: Search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Book'
+        '400':
+          description: bad input parameter
+      x-swagger-router-controller: Book
+      
+    post:
+      tags:
+        - book
+      summary: Adds a book
+      operationId: addBook
+      description: Adds a book to the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Book
+          in: body
+          description: a book
+          schema:
+            $ref: '#/definitions/Book'
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '403':
+          description: Operation not allowed
+        '409':
+          description: an item already exists
+      x-swagger-router-controller: Book
+      
+  '/books/{ISBN}':
+  
+    put:
+      tags:
+        - book
+      summary: Update a book
+      operationId: updateBook
+      description: Update a book in the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: ISBN
+          type: string
+          required: true
+          description: ISBN of the book we want to update
+        - in: body
+          name: Book
+          description: a book updated
+          schema:
+            $ref: '#/definitions/Book'
+      responses:
+        '200':
+          description: item updated
+        '400':
+          description: 'invalid input, object invalid'
+        '403':
+          description: Operation not allowed
+        '404':
+          description: item not found
+      x-swagger-router-controller: Book
+      
+    delete:
+      tags:
+        - book
+      summary: Delete a book
+      operationId: deleteBook
+      description: Delete a book in the system
+      parameters:
+        - name: ISBN
+          in: path
+          type: string
+          required: true
+          description: ISBN of the book we want to delete
+      responses:
+        '200':
+          description: item deleted
+        '400':
+          description: 'invalid input, book doesn''t exist'
+        '403':
+          description: Operation not allowed
+        '404':
+          description: item not found
+      x-swagger-router-controller: Book
+      
+  '/books/{ISBN}/similarTo':
+    get:
+      tags:
+        - book
+      summary: Returns all the book similar to a book
+      description: Returns all the book similar to the book with the ISBN passed
+      operationId: similarTo
+      produces:
+        - application/json
+      parameters:
+        - name: ISBN
+          in: path
+          type: string
+          required: true
+          description: ISBN of the book we want to find similar books
+        - name: page
+          in: query
+          description: Number of the page
+          type: integer
+          format: int32
+          minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of records to return in a single page
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        '200':
+          description: Search similar books
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Book'
+        '400':
+          description: invalid input
+        '404':
+          description: item not found
+      x-swagger-router-controller: Book
+      
+  '/books/{ISBN}/reviews':
+    get:
+      tags:
+        - book
+      summary: Returns all reviews for the book
+      description: Returns all reviews for the book with the ISBN passed
+      operationId: getReviews
+      produces:
+        - application/json
+      parameters:
+        - name: ISBN
+          in: path
+          type: string
+          required: true
+          description: ISBN of the book we want to get Reviews
+        - name: page
+          in: query
+          description: Number of the page
+          type: integer
+          format: int32
+          minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of records to return in a single page
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        '200':
+          description: Search reviews
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Review'
+        '400':
+          description: invalid input
+        '404':
+          description: item not found
+      x-swagger-router-controller: Book
+      
+  '/books/reviews':
+    post:
+      tags:
+        - book
+      summary: Post a review
+      operationId: postReview
+      description: Post a review to the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Review
+          in: body
+          description: a Review
+          schema:
+            $ref: '#/definitions/Review'
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: item not found
+      x-swagger-router-controller: Book
+      
+  '/books/reviews/{ID}':
+    delete:
+      tags:
+        - book
+      summary: Delete a review
+      operationId: deleteReview
+      description: Delete a review from the system
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+      responses:
+        '201':
+          description: item deleted
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: user not found
+    x-swagger-router-controller: Book
+    
+  # MARK: - Authors  
+    
+  '/authors':
+  
+    get:
+      tags:
+        - author
+      summary: Returns the Authors
+      operationId: getAuthors
+      description: Return the Authors
+      produces:
+        - application/json
+      parameters:
+        - name: bookISBN
+          in: query
+          description: Pass the ISBN of the book for looking up authors
+          required: false
+          type: string
+        - name: ID
+          in: query
+          description: Pass an optional search string for looking up authors
+          required: false
+          type: string
+        - name: name
+          in: query
+          description: Pass an optional search string for looking up authors
+          required: false
+          type: string
+        - name: last_name
+          in: query
+          description: Pass an optional search string for looking up authors
+          required: false
+          type: string
+        - name: page
+          in: query
+          description: Number of the page
+          type: integer
+          format: int32
+          minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of records to return in a single page
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        '200':
+          description: Search results
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Author'
+        '400':
+          description: bad input parameter
+      x-swagger-router-controller: Author
+      
+    post:
+      tags:
+        - author
+      summary: adds a new author
+      operationId: addAuthor
+      description: Adds a new Author
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Author
+          in: body
+          description: an author
+          schema:
+            $ref: '#/definitions/Author'
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '403':
+          description: Operation not allowed
+        '409':
+          description: an existing item already exists
+      x-swagger-router-controller: Author
+  
+  '/authors/{ID}':    
+  
+    put:
+      tags:
+        - author
+      summary: update an author
+      operationId: updateAuthor
+      description: Update author checking which field is different
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+          description: ID of the author
+        - name: Author
+          in: body
+          description: an Author updated
+          schema:
+            $ref: '#/definitions/Author'
+      responses:
+        '201':
+          description: user updated
+        '400':
+          description: 'invalid input, object invalid'
+        '403':
+          description: Operation not allowed
+        '404':
+          description: author not found
+      x-swagger-router-controller: Author
+      
+    delete:
+      tags:
+        - author
+      summary: delete an author
+      operationId: deleteAuthor
+      description: Delete an author from the system
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+      responses:
+        '201':
+          description: item deleted
+        '400':
+          description: 'invalid input, object invalid'
+        '403':
+          description: Operation not allowed
+        '404':
+          description: author not found
+    x-swagger-router-controller: Author
+    
+  # MARK: - Users
+    
+  '/user':
+    post:
+      tags:
+        - user
+      summary: Adds a new user / registration
+      operationId: addUser
+      description: Adds a new user / registration
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: User
+          in: body
+          description: a user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+      x-swagger-router-controller: User
+      
+  '/user/login':
+
+    post:
+      tags:
+        - user
+      summary: Login
+      description: Login with a form
+      operationId: userLogin
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: formData
+          required: true
+          type: string
+        - name: password
+          in: formData
+          required: true
+          type: string
+      responses:
+        '200':
+          description: succesfull login
+        '401':
+          description: unauthorized
+      x-swagger-router-controller: User
+  
+  '/user/{ID}':
+  
+    get:
+      tags:
+        - user
+      summary: Returns the personal info of the user
+      description: Returns the personal info of the user which Id is passed
+      operationId: getInfo
+      produces:
+        - application/json
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: Search info
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/User'
+        '400':
+          description: invalid input
+        '404':
+          description: user not found
+      x-swagger-router-controller: User
+      
+    put:
+      tags:
+        - user
+      summary: update a user
+      operationId: updateUser
+      description: Update user checking which field is different
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+          description: ID of the user
+        - name: User
+          in: body
+          description: a User updated
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '201':
+          description: user updated
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: user not found
+      x-swagger-router-controller: User
+      
+    delete:
+      tags:
+        - user
+      summary: delete a user
+      operationId: deleteUser
+      description: Delete a user from the system
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+      responses:
+        '201':
+          description: item deleted
+        '400':
+          description: 'invalid input, user doesn''t exist'
+        '404':
+          description: user not found
+    x-swagger-router-controller: User
+      
+  '/user/{ID}/shoppingBag':
+  
+    get:
+      tags:
+        - user
+      summary: Returns the books in the user's shopping bag
+      description: Returns the books in the user's shopping bag
+      operationId: getShoppingBag
+      produces:
+        - application/json
+      parameters:
+        - name: ID
+          in: path
+          description: User which reservations are searched
+          required: true
+          type: string
+        - name: page
+          in: query
+          description: Number of the page
+          type: integer
+          format: int32
+          minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of records to return in a single page
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        '200':
+          description: search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Book'
+        '400':
+          description: bad input parameter
+        '404':
+          description: item not found
+      x-swagger-router-controller: User
+      
+    post:
+      tags:
+        - user
+      summary: Adds a book in the user's shopping bag
+      operationId: addToShoppingBag
+      description: Adds a book in the user's shopping bag with the specified quantity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: ID
+          in: path
+          description: User which reservations list is searched
+          required: true
+          type: string
+        - name: item
+          in: body
+          description: a Shopping Bag item
+          schema:
+            $ref: '#/definitions/ShoppingBag'
+      responses:
+        '201':
+          description: New shopping bag item
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: item not found
+      x-swagger-router-controller: User
+      
+  '/user/{ID}/shoppingBag/{ISBN}':
+  
+    put:
+      tags:
+        - user
+      summary: Update a shopping bag item
+      operationId: updateShoppingBag
+      description: Update a shopping bag item
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: ID
+          in: path
+          description: User which reservations list is searched
+          required: true
+          type: string
+        - name: ISBN
+          in: path
+          description: Book ISBN
+          required: true
+          type: string
+        - name: item
+          in: body
+          description: a Shopping Bag item
+          schema:
+            $ref: '#/definitions/ShoppingBag'
+      responses:
+        '200':
+          description: Shopping bag updated
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: item not found
+      x-swagger-router-controller: User
+      
+    delete:
+      tags:
+        - user
+      summary: Remove item from user's shopping bag
+      operationId: deleteFromShoppingBag
+      description: Remove item from user's shopping bag
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: ID
+          in: path
+          description: User which reservations list is searched
+          required: true
+          type: string
+        - name: ISBN
+          in: path
+          description: Book ISBN
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Shopping bag item removed
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: item not found
+      x-swagger-router-controller: User
+      
+  # MARK: - Events
+      
+  '/events':
+  
+    get:
+      tags:
+        - event
+      summary: Returns the presentation events of books in alphabetical order
+      operationId: getEvents
+      produces:
+        - application/json
+      parameters:
+        - name: bookISBN
+          in: query
+          description: Pass the ISBN of the book for looking up events
+          required: false
+          type: string
+        - name: ID
+          in: query
+          description: Pass an optional search string for looking up events
+          required: false
+          type: string
+        - name: venue
+          in: query
+          description: Pass an optional search string for looking up events
+          required: false
+          type: string
+        - name: address
+          in: query
+          description: Pass an optional search string for looking up events
+          required: false
+          type: string
+        - name: city
+          in: query
+          description: Pass an optional search string for looking up events
+          required: false
+          type: string
+        - name: page
+          in: query
+          description: Number of the page
+          type: integer
+          format: int32
+          minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of records to return in a single page
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        '200':
+          description: Search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event'
+        '400':
+          description: bad input parameter
+      x-swagger-router-controller: Event
+      
+    post:
+      tags:
+        - event
+      summary: Post a presentation event
+      operationId: postEvent
+      description: Post a presentation event
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: event
+          in: body
+          description: an Event
+          schema:
+            $ref: '#/definitions/Event'
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '403':
+          description: Operation not allowed
+      x-swagger-router-controller: Event
+      
+  '/events/{ID}':
+    delete:
+      tags:
+        - event
+      summary: Delete a presentation event
+      operationId: deleteEvent
+      description: Delete a presentation event
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+      responses:
+        '201':
+          description: item deleted
+        '400':
+          description: 'invalid input, object invalid'
+        '403':
+          description: Operation not allowed
+        '404':
+          description: user not found
+    x-swagger-router-controller: Event
+  
+  '/events/latest':
+      
+    get:
+      tags:
+        - event
+      summary: Returns the presentation events in the last month
+      operationId: getLatestEvents
+      produces:
+        - application/json
+      parameters:
+        - name: page
+          in: query
+          description: Number of the page
+          type: integer
+          format: int32
+          minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of records to return in a single page
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        '200':
+          description: Search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event'
+        '400':
+          description: bad input parameter
+      x-swagger-router-controller: Event
+      
+      
+definitions:
+
+  Author:
+    required:
+      - name
+      - lastName
+      - bio
+      - picture
+    properties:
+      ID:
+        type: integer
+        example: 123
+      name:
+        type: string
+        example: Douglas N.
+      lastName:
+        type: string
+        example: Adams
+      bio:
+        type: string
+        example: >-
+          Douglas Adams was born in March 1952 in Cambridge, England. He
+          attended Brentwood boarding school, where he excelled in creative
+          writing and successfully gained a place to study English Literature at
+          Cambridge University.
+      picture:
+        type: string
+        format: URL
+        
+  Book:
+    title: Book
+    description: A book for sale on the e-commerce
+    type: object
+    required:
+      - ISBN
+      - title
+      - genre
+      - picture
+      - abstract
+      - releaseDate
+      - factSheet
+      - theme
+      - price
+    properties:
+      authors:
+        type: array
+        items:
+          type: integer
+          description: Author IDs
+      ISBN:
+        type: string
+        format: uuid
+        example: 978-1509852796
+      title:
+        type: string
+        example: The Hitchhiker's guide to the Galaxy
+      genre:
+        type: string
+        format: Genre-enum
+        example: Science fiction
+        enum:
+          - Action and adventure
+          - Alternate history
+          - Anthology
+          - Art
+          - Autobiography
+          - Biography
+          - Book review
+          - Chick lit
+          - Children's literature
+          - Cookbook
+          - Comic book
+          - Coming-of-age
+          - Crime
+          - Diary
+          - Dictionary
+          - Drama
+          - Encyclopedia
+          - Fairytale
+          - Fantasy
+          - Guide
+          - Graphic novel
+          - Health
+          - History
+          - Historical fiction
+          - Horror
+          - Journal
+          - Math
+          - Memoir
+          - Mystery
+          - Paranormal romance
+          - Picture book
+          - Poetry
+          - Political thriller
+          - Prayer
+          - 'Religion, spirituality, and new age'
+          - Review
+          - Romance
+          - Satire
+          - Science
+          - Science fiction
+          - Self help
+          - Short story
+          - Suspense
+          - Thriller
+          - Travel
+          - True crime
+          - Young adult
+      picture:
+        type: string
+        format: URL
+      abstract:
+        type: string
+        example: >-
+          One Thursday lunchtime the Earth gets unexpectedly demolished to make
+          way for a new hyperspace bypass. For Arthur Dent, who has only just
+          had his house demolished that morning, this seems already to be rather
+          a lot to cope with. Sadly, however, the weekend has only just begun.
+          The Galaxy may offer a mind-boggling variety of ways to be blown up
+          and/or insulted, but it's very hard to get a cup of tea.
+      releaseDate:
+        type: string
+        format: date
+        example: '1978-10-12'
+      factSheet:
+        type: string
+        example: >-
+          First appearance  Fit the First (radio) Last appearance  And Another
+          Thing... Created by  Douglas Adams Portrayed by  Peter Jones (all save
+          for following) William Franklyn (radio series 3–5) John Lloyd (radio
+          series 6) Stephen Fry (film) Information Nickname  The Guide Origin 
+          Ursa Minor Beta
+      soldCopies:
+        type: integer
+        example: 235000000
+      theme:
+        type: string
+        format: Theme-enum
+        example: Science fiction
+        enum:
+          - Love
+          - Death
+          - Good vs Evil
+          - Coming of Age
+          - Power and Corruption
+          - Survival
+          - Courage and Heroism
+          - Prejudice
+          - Individual vs Society
+          - War
+      price:
+        type: number
+        example: 10.0
+          
+  Event:
+    required:
+      - B_ISBN
+      - startingDate
+      - endingDate
+      - venue
+      - address
+      - city
+    properties:
+      ID:
+        type: integer
+        example: 123
+      B_ISBN:
+        type: string
+        format: uuid
+        example: 978-1509852796
+      startingDate:
+        type: string
+        format: date
+        example: 1978-10-12T00:00:00.000Z
+      endingDate:
+        type: string
+        format: date
+        example: 1978-10-12T00:00:00.000Z
+      venue:
+        type: string
+        example: "Castello Sforzesco"
+      address:
+        type: string
+        example: "Via Filippo Corridoni, 22"
+      city:
+        type: string
+        example: "Milano"
+        
+  Review:
+    required:
+      - U_ID
+      - B_ISBN
+      - rating
+      - description
+      - date
+    properties:
+      ID:
+        type: integer
+        example: 123
+      U_ID:
+        type: integer
+        example: 123
+      B_ISBN:
+        type: string
+        format: uuid
+        example: 978-1509852796
+      rating:
+        type: integer
+        format: int32
+        example: 3
+      description:
+        type: string
+        example: 'UTTER, UTTER GENIUS.'
+      date:
+        type: string
+        format: date
+        example: 1978-10-13T00:00:00.000Z
+        
+  ShoppingBag:
+    required:
+      - U_ID
+      - B_ISBN
+      - quantity
+      - version
+    properties:
+      U_ID:
+        type: integer
+        example: 123
+      B_ISBN:
+        type: string
+        format: uuid
+        example: 978-1509852796
+      quantity:
+        type: integer
+        format: int32
+        example: 3
+      version:
+        type: string
+        enum:
+          - DIGITAL
+          - PAPER
+        
+  User:
+    required:
+      - email
+      - name
+      - lastName
+    properties:
+      ID:
+        type: integer
+        example: 123
+      email:
+        type: string
+        format: email
+        example: pierluigi.sanpietro@mail.polimi.it
+      password:
+        type: string
+        format: password
+        example: Th1s-i5_A+zEkoOrE.Pas5w00Rd
+      name:
+        type: string
+        example: Pierluigi
+      lastName:
+        type: string
+        example: Sanpietro
+      isAdmin:
+        type: boolean
+        example: false
+      
