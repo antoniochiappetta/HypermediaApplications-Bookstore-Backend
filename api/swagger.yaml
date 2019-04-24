@@ -894,6 +894,7 @@ definitions:
       - factSheet
       - theme
       - price
+      - interview
     properties:
       authors:
         type: array
@@ -1004,6 +1005,9 @@ definitions:
       price:
         type: number
         example: 10.0
+      interview:
+        type: string
+        example: The author said this book tells about his childhood
           
   Event:
     required:

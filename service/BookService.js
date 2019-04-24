@@ -28,7 +28,8 @@ exports.addBook = function(book) {
           [Book.releaseDate]: book.releaseDate,
           [Book.title]: book.title,
           [Book.theme]: book.theme,
-          [Book.price]: book.price
+          [Book.price]: book.price,
+          [Book.interview]: book.interview
         })
         .into(Book.getTable)
         .transacting(trx)
@@ -342,7 +343,8 @@ exports.updateBook = function(iSBN,book) {
           [Book.releaseDate]: book.releaseDate,
           [Book.title]: book.title,
           [Book.theme]: book.theme,
-          [Book.price]: book.price
+          [Book.price]: book.price,
+          [Book.interview]: book.interview
         })
         .then(function() {
           return {

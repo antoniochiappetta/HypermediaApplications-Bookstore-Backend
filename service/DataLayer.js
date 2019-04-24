@@ -9,8 +9,9 @@
   * 3) Right click on the server and check that Connection/Port is set to 5432
   * 4) Right click on Login/Group Roles and create user 'ganesh' with Definition/Password 'ballerinidiganesh' and Privileges/can login? 'Yes'
   * 5) Right click on Databases and create db 'e-commerce-hypermedia' with owner 'ganesh'
-  * 6) To export DB for deployment use PGPASSWORD=ballerinidiganesh /Library/PostgreSQL/11/bin/pg_dump -Fc --no-acl -U ganesh e-commerce-hypermedia > bookstore-hypermedia.dump
-  * 7) Then deploy the dump on a public url and setup Heroku's DATABASE_URL config var to point at it
+  * 6) To export DB for deployment use (on MacOS at least) PGPASSWORD=ballerinidiganesh /Library/PostgreSQL/11/bin/pg_dump -Fc --no-acl -U ganesh e-commerce-hypermedia > bookstore-hypermedia.dump
+  * 7) Then deploy the dump on a public url (es. AWS S3 bucket) and setup Heroku's DATABASE_URL config var to point at it with heroky cli like this heroku pg:backups:restore '<DB URL>' DATABASE_URL --app bookstore-hypermedia-be
+  * 8) In our case the DB URL is https://bookstore-hypermedia-be.s3.amazonaws.com/Database/bookstore-hypermedia.dump
   */
 
 const sqlDbFactory = require("knex");
