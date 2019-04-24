@@ -4,6 +4,8 @@ let { database } = require("./DataLayer");
 let User = require("../models/user");
 let ShoppingBag = require("../models/shoppingbag");
 
+const bcrypt = require('bcrypt');
+
 /**
  * Adds a book in the user's shopping bag
  * Adds a book in the user's shopping bag with the specified quantity
@@ -67,11 +69,13 @@ exports.addToShoppingBag = function(iD,item) {
  * no response value expected for this operation
  **/
 exports.addUser = function(user) {
+  // Encrypt password
+  let hashedPassword = bcrypt.hashSync(user.password, 10);
   return database.transaction(function(trx) {
     database
       .insert({
         [User.email]: user.email,
-        [User.password]: user.password,
+        [User.password]: hashedPassword,
         [User.name]: user.name,
         [User.lastName]: user.lastName,
         [User.isAdmin]: user.isAdmin
@@ -318,6 +322,33 @@ exports.updateUser = function(iD,user) {
  * no response value expected for this operation
  **/
 exports.userLogin = function(email,password) {
-  // TODO empty
+  return database(User.getTable)
+  .where(User.email, email)
+  .then(function(results) {
+    if (results.length > 0) {
+      let user = results[0]
+      console.log(user);
+      // Compare sent password with hashed password on the db
+      if(bcrypt.compareSync(password, user.password)) {
+        // Passwords match, store user in session
+        return {
+          response: "User logged in",
+          userId: user.ID,
+          status: 200
+        }
+       } else {
+        // Passwords don't match
+        return {
+          error: "Wrong credentials",
+          status: 401
+        }
+       }
+    } else {
+      return {
+        error: "User not found",
+        status: 404
+      }
+    }
+  })
 }
 

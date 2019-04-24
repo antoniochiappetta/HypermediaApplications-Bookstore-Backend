@@ -18,29 +18,29 @@ const sqlDbFactory = require("knex");
 
 // LOCAL
 
-// let sqlDb = sqlDbFactory({
-//   client: "pg",
-//   connection: {
-//     user: 'ganesh',
-//     host: 'localhost',
-//     database: 'e-commerce-hypermedia',
-//     password: 'ballerinidiganesh',
-//     port: 5432
-//   },
-//   searchPath: ['ecommerce'],
-//   ssl: true,
-//   debug: true
-// });
-
-// REMOTE
-
 let sqlDb = sqlDbFactory({
   client: "pg",
-  connection: process.env.DATABASE_URL,
+  connection: {
+    user: 'ganesh',
+    host: 'localhost',
+    database: 'e-commerce-hypermedia',
+    password: 'ballerinidiganesh',
+    port: 5432
+  },
   searchPath: ['ecommerce'],
   ssl: true,
   debug: true
 });
+
+// REMOTE
+
+// let sqlDb = sqlDbFactory({
+//   client: "pg",
+//   connection: process.env.DATABASE_URL,
+//   searchPath: ['ecommerce'],
+//   ssl: true,
+//   debug: true
+// });
 
 /**
  * Use the connection data specified before to connect to the database on localhost and test the connection with a query on DB version
