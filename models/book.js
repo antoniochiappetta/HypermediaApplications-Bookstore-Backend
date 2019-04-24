@@ -19,7 +19,8 @@ const table = {
         alphabetic: "alphabetic"
     },
     theme: "theme",
-    price: "price"
+    price: "price",
+    interview: "interview"
 }
 
 module.exports = table;
