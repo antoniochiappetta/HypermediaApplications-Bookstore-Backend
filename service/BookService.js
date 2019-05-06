@@ -137,6 +137,17 @@ exports.deleteReview = function(iD) {
 
 
 /**
+ * Get a list of best sellers
+ * All the books ordered according to their number of sold copies (i.e. times posted in a shopping bag)
+ *
+ * returns List
+ **/
+exports.getBestSellers = function() {
+  // TODO
+}
+
+
+/**
  * Returns the Books
  * By passing in the appropriate options, you can search for available inventory in the system
  *
@@ -149,7 +160,7 @@ exports.deleteReview = function(iD) {
  * limit Integer Maximum number of records to return (optional)
  * returns List
  **/
-exports.getBooks = function(iSBN,author,title,release_date,order_type,page,limit) {
+exports.getBooks = function(iSBN,author,title,release_date,genre,theme,order_type,page,limit) {
   return database(Book.getTable)
   .modify(function(queryBuilder) {
     if (iSBN)
@@ -160,6 +171,10 @@ exports.getBooks = function(iSBN,author,title,release_date,order_type,page,limit
       queryBuilder.where(Book.title, title)
     if (release_date)
       queryBuilder.where(Book.releaseDate, release_date)
+    if (genre)
+      queryBuilder.where(Book.genre, genre)
+    if (theme)
+      queryBuilder.where(Book.theme, theme)
     if (order_type) {
       switch (order_type) {
         case Book.orderType.soldCopies:
@@ -192,6 +207,80 @@ exports.getBooks = function(iSBN,author,title,release_date,order_type,page,limit
 
 
 /**
+ * Get a list of favourite readings
+ * All the books ordered according to their presence in users' shopping bags
+ *
+ * returns List
+ **/
+exports.getFavouriteReadings = function() {
+  // TODO
+}
+
+
+/**
+ * Get list of genres
+ * Get list of genres
+ *
+ * returns List
+ **/
+exports.getGenres = function() {
+  return {
+    message: "Genres",
+    content: [
+      "Action and adventure",
+      "Alternate history",
+      "Anthology",
+      "Art",
+      "Autobiography",
+      "Biography",
+      "Book review",
+      "Chick lit",
+      "Children's literature",
+      "Cookbook",
+      "Comic book",
+      "Coming-of-age",
+      "Crime",
+      "Diary",
+      "Dictionary",
+      "Drama",
+      "Encyclopedia",
+      "Fairytale",
+      "Fantasy",
+      "Guide",
+      "Graphic novel",
+      "Health",
+      "History",
+      "Historical fiction",
+      "Horror",
+      "Journal",
+      "Math",
+      "Memoir",
+      "Mystery",
+      "Paranormal romance",
+      "Picture book",
+      "Poetry",
+      "Political thriller",
+      "Prayer",
+      "Religion, spirituality, and new age",
+      "Review",
+      "Romance",
+      "Satire",
+      "Science",
+      "Science fiction",
+      "Self help",
+      "Short story",
+      "Suspense",
+      "Thriller",
+      "Travel",
+      "True crime",
+      "Young adult"
+    ],
+    status: 200
+  }
+}
+
+
+/**
  * Returns all the book similar to a book
  * Returns all the book similar to the book with the ISBN passed
  *
@@ -211,6 +300,32 @@ exports.getReviews = function(iSBN,page,limit) {
         status: 200
       }
     })
+}
+
+
+/**
+ * Get list of themes
+ * Get list of themes
+ *
+ * returns List
+ **/
+exports.getThemes = function() {
+  return {
+    message: "Themes",
+    content: [
+      "Love",
+      "Death",
+      "Good vs Evil",
+      "Coming of Age",
+      "Power and Corruption",
+      "Survival",
+      "Courage and Heroism",
+      "Prejudice",
+      "Individual vs Society",
+      "War"
+    ],
+    status: 200
+  }
 }
 
 
