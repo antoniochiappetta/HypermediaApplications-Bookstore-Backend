@@ -3,6 +3,7 @@
 let { database } = require("./DataLayer");
 let User = require("../models/user");
 let ShoppingBag = require("../models/shoppingbag");
+let Book = require("../models/book");
 
 const bcrypt = require('bcrypt');
 
@@ -15,41 +16,49 @@ const bcrypt = require('bcrypt');
  * no response value expected for this operation
  **/
 exports.addToShoppingBag = function(iD,item) {
+  console.log(item)
   return database(Book.getTable)
-  .where(Book.ISBN, item.book)
+  .where(Book.isbn, item.B_ISBN)
   .count()
   .then(function(results) {
     if (results[0].count > 0) {
-      return database(User.getTable)
-      .where(User.ID, id)
-      .count()
-      .then(function(results) {
-        if (results[0].count > 0) {
-          return database.transaction(function(trx) {
-            database
-              .insert({
-                [ShoppingBag.user]: item.U_ID,
-                [ShoppingBag.book]: item.B_ISBN,
-                [ShoppingBag.quantity]: item.quantity,
-                [ShoppingBag.version]: item.version
-              })
-              .into(Review.getTable)
-              .transacting(trx)
-              .then(function() {
-                return {
-                  response: "Shopping bag item added",
-                  status: 201
-                }
-              })
-              .then(trx.commit)
-              .catch(trx.rollback)
-          })
-        } else {
-          return {
-            error: "User not found",
-            status: 404
+      return database(Book.getTable)
+      .increment(Book.soldCopies)
+      .where(Book.isbn, item.B_ISBN)
+      .then(function() {
+        console.log(item)
+        console.log(User)
+        return database(User.getTable)
+        .where(User.id, item.U_ID)
+        .count()
+        .then(function(results) {
+          if (results[0].count > 0) {
+            return database.transaction(function(trx) {
+              database
+                .insert({
+                  [ShoppingBag.user]: item.U_ID,
+                  [ShoppingBag.book]: item.B_ISBN,
+                  [ShoppingBag.quantity]: item.quantity,
+                  [ShoppingBag.version]: item.version
+                })
+                .into(ShoppingBag.getTable)
+                .transacting(trx)
+                .then(function() {
+                  return {
+                    response: "Shopping bag item added",
+                    status: 201
+                  }
+                })
+                .then(trx.commit)
+                .catch(trx.rollback)
+            })
+          } else {
+            return {
+              error: "User not found",
+              status: 404
+            }
           }
-        }
+        })
       })
     } else {
       return {

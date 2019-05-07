@@ -2,6 +2,7 @@
 
 let { database } = require("./DataLayer");
 let Event = require("../models/event");
+let Book = require("../models/book");
 
 
 /**
@@ -69,7 +70,7 @@ exports.getEvents = function(bookISBN,iD,venue,address,city,page,limit) {
     if (city)
       queryBuilder.where(Event.city, city)
     if (bookISBN) {
-      queryBuilder.where(Review.book, iSBN)
+      queryBuilder.where(Event.book, iSBN)
     }
   })
   .limit(limit ? limit: 100)
@@ -103,7 +104,7 @@ exports.postEvent = function(event) {
   let isAuthorized = true // TODO
   if (isAuthorized) {
     return database(Book.getTable)
-    .where(Book.ISBN, review.book)
+    .where(Book.isbn, event.B_ISBN)
     .count()
     .then(function(results) {
       if (results[0].count > 0) {

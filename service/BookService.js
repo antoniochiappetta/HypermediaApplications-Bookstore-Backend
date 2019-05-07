@@ -6,6 +6,7 @@ let Book = require("../models/book");
 let WrittenBy = require("../models/writtenby");
 let Review = require("../models/review");
 let User = require("../models/user");
+let ShoppingBag = require("../models/shoppingbag");
 
 /**
  * Adds a book
@@ -18,6 +19,7 @@ exports.addBook = function(book) {
   let isAuthorized = true // TODO
   if (isAuthorized) {
     return database.transaction(function(trx) {
+      console.log(book)
       database
         .insert({
           [Book.isbn]: book.ISBN,
@@ -34,7 +36,6 @@ exports.addBook = function(book) {
         .into(Book.getTable)
         .transacting(trx)
         .then(function(_ids) {
-          console.log(book.authors)
           return Promise.map(book.authors, function(authorId) {
             console.log(authorId)
             return database
@@ -143,7 +144,16 @@ exports.deleteReview = function(iD) {
  * returns List
  **/
 exports.getBestSellers = function() {
-  // TODO
+  return database(Book.getTable)
+  .orderBy(Book.soldCopies, "desc")
+  .limit(10)
+  .then(function(results) {
+    return {
+      message: "Books",
+      content: results,
+      status: 200
+    }
+  })
 }
 
 
@@ -213,7 +223,22 @@ exports.getBooks = function(iSBN,author,title,release_date,genre,theme,order_typ
  * returns List
  **/
 exports.getFavouriteReadings = function() {
-  // TODO
+  return database(ShoppingBag.getTable)
+  .select(ShoppingBag.book)
+  .groupBy(ShoppingBag.book)
+  .count()
+  .orderBy('count', 'desc')
+  .map(function(row) {
+    return database(Book.getTable)
+    .where(Book.isbn, row.B_ISBN)
+  })
+  .then(function(results) {
+    return {
+      message: "Books",
+      content: results,
+      status: 200
+    }
+  })
 }
 
 
@@ -224,59 +249,62 @@ exports.getFavouriteReadings = function() {
  * returns List
  **/
 exports.getGenres = function() {
-  return {
-    message: "Genres",
-    content: [
-      "Action and adventure",
-      "Alternate history",
-      "Anthology",
-      "Art",
-      "Autobiography",
-      "Biography",
-      "Book review",
-      "Chick lit",
-      "Children's literature",
-      "Cookbook",
-      "Comic book",
-      "Coming-of-age",
-      "Crime",
-      "Diary",
-      "Dictionary",
-      "Drama",
-      "Encyclopedia",
-      "Fairytale",
-      "Fantasy",
-      "Guide",
-      "Graphic novel",
-      "Health",
-      "History",
-      "Historical fiction",
-      "Horror",
-      "Journal",
-      "Math",
-      "Memoir",
-      "Mystery",
-      "Paranormal romance",
-      "Picture book",
-      "Poetry",
-      "Political thriller",
-      "Prayer",
-      "Religion, spirituality, and new age",
-      "Review",
-      "Romance",
-      "Satire",
-      "Science",
-      "Science fiction",
-      "Self help",
-      "Short story",
-      "Suspense",
-      "Thriller",
-      "Travel",
-      "True crime",
-      "Young adult"
-    ],
-    status: 200
-  }
+  return database(Book.getTable)
+  .then(function() {
+    return {
+      message: "Genres",
+      content: [
+        "Action and adventure",
+        "Alternate history",
+        "Anthology",
+        "Art",
+        "Autobiography",
+        "Biography",
+        "Book review",
+        "Chick lit",
+        "Children's literature",
+        "Cookbook",
+        "Comic book",
+        "Coming-of-age",
+        "Crime",
+        "Diary",
+        "Dictionary",
+        "Drama",
+        "Encyclopedia",
+        "Fairytale",
+        "Fantasy",
+        "Guide",
+        "Graphic novel",
+        "Health",
+        "History",
+        "Historical fiction",
+        "Horror",
+        "Journal",
+        "Math",
+        "Memoir",
+        "Mystery",
+        "Paranormal romance",
+        "Picture book",
+        "Poetry",
+        "Political thriller",
+        "Prayer",
+        "Religion, spirituality, and new age",
+        "Review",
+        "Romance",
+        "Satire",
+        "Science",
+        "Science fiction",
+        "Self help",
+        "Short story",
+        "Suspense",
+        "Thriller",
+        "Travel",
+        "True crime",
+        "Young adult"
+      ],
+      status: 200
+    }
+  })
 }
 
 
@@ -310,22 +338,25 @@ exports.getReviews = function(iSBN,page,limit) {
  * returns List
  **/
 exports.getThemes = function() {
-  return {
-    message: "Themes",
-    content: [
-      "Love",
-      "Death",
-      "Good vs Evil",
-      "Coming of Age",
-      "Power and Corruption",
-      "Survival",
-      "Courage and Heroism",
-      "Prejudice",
-      "Individual vs Society",
-      "War"
-    ],
-    status: 200
-  }
+  return database(Book.getTable)
+  .then(function() {
+    return {
+      message: "Themes",
+      content: [
+        "Love",
+        "Death",
+        "Good vs Evil",
+        "Coming of Age",
+        "Power and Corruption",
+        "Survival",
+        "Courage and Heroism",
+        "Prejudice",
+        "Individual vs Society",
+        "War"
+      ],
+      status: 200
+    }
+  })
 }
 
 
@@ -338,12 +369,12 @@ exports.getThemes = function() {
  **/
 exports.postReview = function(review) {
   return database(Book.getTable)
-  .where(Book.ISBN, review.book)
+  .where(Book.isbn, review.B_ISBN)
   .count()
   .then(function(results) {
     if (results[0].count > 0) {
       return database(User.getTable)
-      .where(User.ID, review.user)
+      .where(User.id, review.U_ID)
       .count()
       .then(function(results) {
         if (results[0].count > 0) {
