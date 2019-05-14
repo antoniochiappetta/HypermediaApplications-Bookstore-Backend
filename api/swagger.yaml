@@ -520,32 +520,6 @@ paths:
     x-swagger-router-controller: Author
     
   # MARK: - Users
-    
-  '/user':
-    post:
-      tags:
-        - user
-      summary: Adds a new user / registration
-      operationId: addUser
-      description: Adds a new user / registration
-      consumes:
-        - application/x-www-form-urlencoded
-      produces:
-        - application/json
-      parameters:
-        - name: User
-          in: body
-          description: a user
-          schema:
-            $ref: '#/definitions/User'
-      responses:
-        '201':
-          description: item created
-        '400':
-          description: 'invalid input, object invalid'
-        '409':
-          description: an existing item already exists
-      x-swagger-router-controller: User
       
   '/user/login':
 
@@ -574,23 +548,41 @@ paths:
         '401':
           description: unauthorized
       x-swagger-router-controller: User
-  
-  '/user/{ID}':
+    
+  '/user':
+    post:
+      tags:
+        - user
+      summary: Adds a new user / registration
+      operationId: addUser
+      description: Adds a new user / registration
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: User
+          in: body
+          description: a user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+      x-swagger-router-controller: User
   
     get:
       tags:
         - user
-      summary: Returns the personal info of the user
-      description: Returns the personal info of the user which Id is passed
+      summary: Returns the personal info of the logged user
+      description: Returns the personal info of the logged user
       operationId: getInfo
       produces:
         - application/json
-      parameters:
-        - name: ID
-          in: path
-          type: string
-          required: true
-          description: ID of the user
       responses:
         '200':
           description: Search info
@@ -607,19 +599,14 @@ paths:
     put:
       tags:
         - user
-      summary: update a user
+      summary: Update information about the currently logged user
+      description: Update information about the currently logged user
       operationId: updateUser
-      description: Update user checking which field is different
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          type: string
-          required: true
-          description: ID of the user
         - name: User
           in: body
           description: a User updated
@@ -637,14 +624,9 @@ paths:
     delete:
       tags:
         - user
-      summary: delete a user
+      summary: Delete the currently logged user
+      description: Delete the currently logged user
       operationId: deleteUser
-      description: Delete a user from the system
-      parameters:
-        - name: ID
-          in: path
-          type: string
-          required: true
       responses:
         '201':
           description: item deleted
@@ -654,7 +636,7 @@ paths:
           description: user not found
     x-swagger-router-controller: User
       
-  '/user/{ID}/shoppingBag':
+  '/user/shoppingBag':
   
     get:
       tags:
@@ -665,11 +647,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations are searched
-          required: true
-          type: string
         - name: page
           in: query
           description: Number of the page
@@ -706,11 +683,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations list is searched
-          required: true
-          type: string
         - name: item
           in: body
           description: a Shopping Bag item
@@ -725,7 +697,7 @@ paths:
           description: item not found
       x-swagger-router-controller: User
       
-  '/user/{ID}/shoppingBag/{ISBN}':
+  '/user/shoppingBag/{ISBN}':
   
     put:
       tags:
@@ -738,11 +710,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations list is searched
-          required: true
-          type: string
         - name: ISBN
           in: path
           description: Book ISBN
@@ -773,11 +740,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations list is searched
-          required: true
-          type: string
         - name: ISBN
           in: path
           description: Book ISBN

@@ -5,11 +5,11 @@ var User = require('../service/UserService');
 var Auth = require('./AuthenticationMiddleware');
 
 module.exports.addToShoppingBag = function addToShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  const authResponse = Auth.requiresLogin(req, iD);
+  const authResponse = Auth.requiresLogin(req);
   if (authResponse.status == 401) {
     utils.writeJson(res, authResponse);
   } else {
+    var iD = authResponse.userId;
     var item = req.swagger.params['item'].value;
     User.addToShoppingBag(iD,item)
       .then(function (response) {
@@ -33,11 +33,11 @@ module.exports.addUser = function addUser (req, res, next) {
 };
 
 module.exports.deleteFromShoppingBag = function deleteFromShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  const authResponse = Auth.requiresLogin(req, iD);
+  const authResponse = Auth.requiresLogin(req);
   if (authResponse.status == 401) {
     utils.writeJson(res, authResponse);
   } else {
+    var iD = authResponse.userId;
     var iSBN = req.swagger.params['ISBN'].value;
     User.deleteFromShoppingBag(iD,iSBN)
       .then(function (response) {
@@ -50,11 +50,11 @@ module.exports.deleteFromShoppingBag = function deleteFromShoppingBag (req, res,
 };
 
 module.exports.deleteUser = function deleteUser (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  const authResponse = Auth.requiresLogin(req, iD);
+  const authResponse = Auth.requiresLogin(req);
   if (authResponse.status == 401) {
     utils.writeJson(res, authResponse);
   } else {
+    var iD = authResponse.userId;
     User.deleteUser(iD)
       .then(function (response) {
         utils.writeJson(res, response);
@@ -66,11 +66,11 @@ module.exports.deleteUser = function deleteUser (req, res, next) {
 };
 
 module.exports.getInfo = function getInfo (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  const authResponse = Auth.requiresLogin(req, iD);
+  const authResponse = Auth.requiresLogin(req);
   if (authResponse.status == 401) {
     utils.writeJson(res, authResponse);
   } else {
+    var iD = authResponse.userId;
     User.getInfo(iD)
       .then(function (response) {
         utils.writeJson(res, response);
@@ -83,11 +83,11 @@ module.exports.getInfo = function getInfo (req, res, next) {
 };
 
 module.exports.getShoppingBag = function getShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  const authResponse = Auth.requiresLogin(req, iD);
+  const authResponse = Auth.requiresLogin(req);
   if (authResponse.status == 401) {
     utils.writeJson(res, authResponse);
   } else {
+    var iD = authResponse.userId;
     var page = req.swagger.params['page'].value;
     var limit = req.swagger.params['limit'].value;
     User.getShoppingBag(iD,page,limit)
@@ -101,11 +101,11 @@ module.exports.getShoppingBag = function getShoppingBag (req, res, next) {
 };
 
 module.exports.updateShoppingBag = function updateShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  const authResponse = Auth.requiresLogin(req, iD);
+  const authResponse = Auth.requiresLogin(req);
   if (authResponse.status == 401) {
     utils.writeJson(res, authResponse);
   } else {
+    var iD = authResponse.userId;
     var iSBN = req.swagger.params['ISBN'].value;
     var item = req.swagger.params['item'].value;
     User.updateShoppingBag(iD,iSBN,item)
@@ -119,11 +119,11 @@ module.exports.updateShoppingBag = function updateShoppingBag (req, res, next) {
 };
 
 module.exports.updateUser = function updateUser (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  const authResponse = Auth.requiresLogin(req, iD);
+  const authResponse = Auth.requiresLogin(req);
   if (authResponse.status == 401) {
     utils.writeJson(res, authResponse);
   } else {
+    var iD = authResponse.userId;
     var user = req.swagger.params['User'].value;
     User.updateUser(iD,user)
       .then(function (response) {

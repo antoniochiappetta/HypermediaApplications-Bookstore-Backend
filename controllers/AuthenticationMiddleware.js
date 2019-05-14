@@ -4,25 +4,12 @@
     In other cases, it could happen that no userId is specified and we only need to check for session cookie presence
 */
 
-exports.requiresLogin = function requiresLogin(req,userId) {
-    if (req.session && req.session.userId) {
-        if (userId) {
-            if (userId == req.session.userId) {
-                return {
-                    response: "User logged in",
-                    status: 200
-                }
-            } else {
-                return {
-                    error: "You must request this resource for the currently logged user",
-                    status: 401
-                  }
-            }
-        } else {
-            return {
-                response: "User logged in",
-                status: 200
-            }
+exports.requiresLogin = function requiresLogin(req) {
+    if (req.session) {
+        return {
+            response: "User logged in",
+            status: 200,
+            userId: req.session.userId
         }
     } else {
         return {
