@@ -29,7 +29,7 @@ exports.addToShoppingBag = function(iD,item) {
         console.log(item)
         console.log(User)
         return database(User.getTable)
-        .where(User.id, item.U_ID)
+        .where(User.id, iD)
         .count()
         .then(function(results) {
           if (results[0].count > 0) {
@@ -243,17 +243,20 @@ exports.getShoppingBag = function(iD,page,limit) {
  **/
 exports.updateShoppingBag = function(iD,iSBN,item) {
   return database(ShoppingBag.getTable)
-    .where(ShoppingBag.id, iD)
+    .where(ShoppingBag.user, iD)
     .count()
     .then(function(results) {
       if (results[0].count > 0) {
         return database(Book.getTable)
-        .where(Book.iD, iSBN)
+        .where(Book.isbn, iSBN)
         .count()
         .then(function(results) {
           if (results[0].count > 0) {
             return database(ShoppingBag.getTable)
-            .where(ShoppingBag.user, iD)
+            .where({
+              [ShoppingBag.user]: item.U_ID,
+              [ShoppingBag.book]: item.B_ISBN
+            })
             .update({
               [ShoppingBag.user]: item.U_ID,
               [ShoppingBag.book]: item.B_ISBN,
