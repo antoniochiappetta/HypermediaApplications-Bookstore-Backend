@@ -63,8 +63,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, function(middleware) {
   // Serve the Swagger documents and Swagger UI
   app.use(middleware.swaggerUi());
 
-  app.use(serveStatic(__dirname + "https://bookstore-hypermedia-fe.herokuapp.com"));
-
   setupDataLayer().then((res, err) => {
     if (err) {
       console.log("Unable to connect to the database, shutting down...");
