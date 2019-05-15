@@ -36,7 +36,7 @@ exports.addToShoppingBag = function(iD,item) {
             return database.transaction(function(trx) {
               database
                 .insert({
-                  [ShoppingBag.user]: item.U_ID,
+                  [ShoppingBag.user]: iD,
                   [ShoppingBag.book]: item.B_ISBN,
                   [ShoppingBag.quantity]: item.quantity,
                   [ShoppingBag.version]: item.version
@@ -218,6 +218,7 @@ exports.getInfo = function(iD) {
  * returns List
  **/
 exports.getShoppingBag = function(iD,page,limit) {
+  console.log(iD)
   return database(ShoppingBag.getTable)
     .where(ShoppingBag.user, iD)
     .limit(limit ? limit: 100)

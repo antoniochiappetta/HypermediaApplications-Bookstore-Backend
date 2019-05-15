@@ -7,6 +7,7 @@ let WrittenBy = require("../models/writtenby");
 let Review = require("../models/review");
 let User = require("../models/user");
 let ShoppingBag = require("../models/shoppingbag");
+let Author = require("../models/author");
 
 /**
  * Adds a book
@@ -150,6 +151,30 @@ exports.getBestSellers = function() {
   .then(function(results) {
     return {
       message: "Books",
+      content: results,
+      status: 200
+    }
+  })
+}
+
+/**
+ * Return the authors of the book
+ * Return the authors of the book
+ *
+ * iSBN String ISBN of the book
+ * returns List
+ **/
+exports.getBookAuthors = function(iSBN) {
+  return database(Author.getTable)
+  .whereIn(Author.id, function() {
+    this
+      .select(WrittenBy.author)
+      .from(WrittenBy.getTable)
+      .where(WrittenBy.book, iSBN)
+  })
+  .then(function(results) {
+    return {
+      message: "Authors",
       content: results,
       status: 200
     }
@@ -367,21 +392,23 @@ exports.getThemes = function() {
  * review Review a Review (optional)
  * no response value expected for this operation
  **/
-exports.postReview = function(review) {
+exports.postReview = function(iD,review) {
   return database(Book.getTable)
   .where(Book.isbn, review.B_ISBN)
   .count()
   .then(function(results) {
     if (results[0].count > 0) {
       return database(User.getTable)
-      .where(User.id, review.U_ID)
+      .where(User.id, iD)
       .count()
       .then(function(results) {
         if (results[0].count > 0) {
+          console.log(iD)
+          console.log(review)
           return database.transaction(function(trx) {
             database
               .insert({
-                [Review.user]: review.U_ID,
+                [Review.user]: iD,
                 [Review.book]: review.B_ISBN,
                 [Review.date]: review.date,
                 [Review.description]: review.description,

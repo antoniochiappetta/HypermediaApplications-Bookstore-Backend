@@ -25,6 +25,17 @@ module.exports.deleteAuthor = function deleteAuthor (req, res, next) {
     });
 };
 
+module.exports.getAuthorBooks = function getAuthorBooks (req, res, next) {
+  var iD = req.swagger.params['ID'].value;
+  Author.getAuthorBooks(iD)
+    .then(function (response) {
+      utils.writeJson(res, response);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response);
+    });
+};
+
 module.exports.getAuthors = function getAuthors (req, res, next) {
   var bookISBN = req.swagger.params['bookISBN'].value;
   var iD = req.swagger.params['ID'].value;

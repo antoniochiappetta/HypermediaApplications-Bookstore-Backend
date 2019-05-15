@@ -4,8 +4,8 @@
 
 const table = {
     getTable: "ShoppingBag",
-    book: "B_ISBN",
     user: "U_ID",
+    book: "B_ISBN",
     quantity: "quantity",
     version: "version"
 }
