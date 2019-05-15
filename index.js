@@ -7,10 +7,10 @@ var fs = require("fs"),
 var app = require("connect")();
 var swaggerTools = require("swagger-tools");
 var jsyaml = require("js-yaml");
-var serverPort = process.env.PORT || 8080;
+var serverPort = process.env.PORT || 8081;
 let cookieSession = require("cookie-session");
 let cookieParser = require("cookie-parser");
-let serveStatic = require("serve-static");
+var cors = require('cors');
 
 let { setupDataLayer } = require("./service/DataLayer");
 
@@ -25,25 +25,8 @@ var options = {
 var spec = fs.readFileSync(path.join(__dirname, "api/swagger.yaml"), "utf8");
 var swaggerDoc = jsyaml.safeLoad(spec);
 
-// Add headers
-app.use(function (req, res, next) {
-
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
-
-  // Pass to next layer of middleware
-  next();
-});
+// CORS policy
+app.use(cors())
 
 // Add cookies to responses
 app.use(cookieParser());
