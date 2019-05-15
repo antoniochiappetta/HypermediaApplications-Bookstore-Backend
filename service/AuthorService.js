@@ -2,6 +2,8 @@
 
 let { database } = require("./DataLayer");
 let Author = require("../models/author");
+let Book = require("../models/book");
+let WrittenBy = require("../models/writtenby");
 
 /**
  * adds a new author
@@ -77,6 +79,30 @@ exports.deleteAuthor = function(iD) {
       status: 403
     }
   }
+}
+
+/**
+ * Return the books of the author
+ * Return the books of the authors
+ *
+ * iD String ID of the author
+ * returns List
+ **/
+exports.getAuthorBooks = function(iD) {
+  return database(Book.getTable)
+  .whereIn(Book.isbn, function() {
+    this
+      .select(WrittenBy.book)
+      .from(WrittenBy.getTable)
+      .where(WrittenBy.author, iD)
+  })
+  .then(function(results) {
+    return {
+      message: "Books",
+      content: results,
+      status: 200
+    }
+  })
 }
 
 

@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
   version: 1.0.0
-  title: e-Commerce Bookstore
+  title: e-Commerce Bookstore - Local
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
@@ -176,6 +176,32 @@ paths:
           description: 'invalid input, book doesn''t exist'
         '403':
           description: Operation not allowed
+        '404':
+          description: item not found
+      x-swagger-router-controller: Book
+      
+  '/books/{ISBN}/authors':
+    get:
+      tags:
+        - book
+      summary: Return the authors of the book
+      description: Return the authors of the book
+      operationId: getBookAuthors
+      parameters:
+        - name: ISBN
+          in: path
+          type: string
+          required: true
+          description: ISBN of the book
+      responses:
+        '200':
+          description: Authors of the book
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Author'
+        '400':
+          description: invalid input
         '404':
           description: item not found
       x-swagger-router-controller: Book
@@ -518,6 +544,32 @@ paths:
         '404':
           description: author not found
     x-swagger-router-controller: Author
+    
+  '/authors/{ID}/books':
+    get:
+      tags:
+        - author
+      summary: Return the books of the author
+      description: Return the books of the authors
+      operationId: getAuthorBooks
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+          description: ID of the author
+      responses:
+        '200':
+          description: Books of the author
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Book'
+        '400':
+          description: invalid input
+        '404':
+          description: item not found
+      x-swagger-router-controller: Author
     
   # MARK: - Users
       
@@ -1090,7 +1142,6 @@ definitions:
         
   Review:
     required:
-      - U_ID
       - B_ISBN
       - rating
       - description
@@ -1120,7 +1171,6 @@ definitions:
         
   ShoppingBag:
     required:
-      - U_ID
       - B_ISBN
       - quantity
       - version

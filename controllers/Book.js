@@ -2,6 +2,7 @@
 
 var utils = require('../utils/writer.js');
 var Book = require('../service/BookService');
+var Auth = require('./AuthenticationMiddleware');
 
 module.exports.addBook = function addBook (req, res, next) {
   var book = req.swagger.params['Book'].value;
@@ -38,6 +39,17 @@ module.exports.deleteReview = function deleteReview (req, res, next) {
 
 module.exports.getBestSellers = function getBestSellers (req, res, next) {
   Book.getBestSellers()
+    .then(function (response) {
+      utils.writeJson(res, response);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response);
+    });
+};
+
+module.exports.getBookAuthors = function getBookAuthors (req, res, next) {
+  var iSBN = req.swagger.params['ISBN'].value;
+  Book.getBookAuthors(iSBN)
     .then(function (response) {
       utils.writeJson(res, response);
     })
@@ -109,14 +121,20 @@ module.exports.getThemes = function getThemes (req, res, next) {
 };
 
 module.exports.postReview = function postReview (req, res, next) {
-  var review = req.swagger.params['Review'].value;
-  Book.postReview(review)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    var review = req.swagger.params['Review'].value;
+    Book.postReview(iD,review)
+      .then(function (response) {
+        utils.writeJson(res, response);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response);
+      });
+  }
 };
 
 module.exports.similarTo = function similarTo (req, res, next) {
