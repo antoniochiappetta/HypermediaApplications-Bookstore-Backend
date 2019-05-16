@@ -70,7 +70,7 @@ exports.getEvents = function(bookISBN,iD,venue,address,city,page,limit) {
     if (city)
       queryBuilder.where(Event.city, city)
     if (bookISBN) {
-      queryBuilder.where(Event.book, iSBN)
+      queryBuilder.where(Event.book, bookISBN)
     }
   })
   .limit(limit ? limit: 100)
