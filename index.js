@@ -29,7 +29,7 @@ var swaggerDoc = jsyaml.safeLoad(spec);
 app.use(cors({
   origin: 'https://bookstore-hypermedia-fe.herokuapp.com/',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}))
+}));
 
 // Add cookies to responses
 app.use(cookieParser());
