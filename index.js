@@ -26,7 +26,10 @@ var spec = fs.readFileSync(path.join(__dirname, "api/swagger.yaml"), "utf8");
 var swaggerDoc = jsyaml.safeLoad(spec);
 
 // CORS policy
-app.use(cors())
+app.use(cors({
+  origin: 'https://bookstore-hypermedia-fe.herokuapp.com/',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}))
 
 // Add cookies to responses
 app.use(cookieParser());
