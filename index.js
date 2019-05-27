@@ -4,7 +4,8 @@ var fs = require("fs"),
   path = require("path"),
   http = require("http");
 
-var app = require("connect")();
+const express = require("express")
+var app = express();
 var swaggerTools = require("swagger-tools");
 var jsyaml = require("js-yaml");
 var serverPort = process.env.PORT || 8080;
@@ -13,6 +14,7 @@ let cookieParser = require("cookie-parser");
 var cors = require('cors');
 
 let { setupDataLayer } = require("./service/DataLayer");
+var docsRouter = require("./docs/docs-router");
 
 // swaggerRouter configuration
 var options = {
@@ -31,6 +33,9 @@ app.use(cors({origin: 'https://bookstore-hypermedia-fe.herokuapp.com', credentia
 // Add cookies to responses
 app.use(cookieParser());
 app.use(cookieSession({ name: "session", keys: ["abc", "def"] }));
+
+// Documentation
+app.use('/', docsRouter);
 
 // Initialize the Swagger middleware
 swaggerTools.initializeMiddleware(swaggerDoc, function(middleware) {

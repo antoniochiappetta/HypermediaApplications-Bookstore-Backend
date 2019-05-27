@@ -365,3 +365,19 @@ exports.userLogin = function(email,password) {
   })
 }
 
+/**
+ * Logout
+ * Removes user session data
+ *
+ * no response value expected for this operation
+ **/
+exports.userLogout = function() {
+  return new Promise(function(resolve, reject) {
+    let response = {
+      response: "User logged out",
+      status: 200
+    }
+    resolve(response);
+  });
+}
+
