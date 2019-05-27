@@ -149,3 +149,14 @@ module.exports.userLogin = function userLogin (req, res, next) {
       utils.writeJson(res, response);
     });
 };
+
+module.exports.userLogout = function userLogout (req, res, next) {
+  User.userLogout()
+    .then(function (response) {
+      req.session = null;
+      utils.writeJson(res, response);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response);
+    });
+};

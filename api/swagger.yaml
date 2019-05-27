@@ -3,9 +3,6 @@ info:
   description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
   version: 1.0.0
   title: e-Commerce Bookstore - Local
-  license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 host: 'localhost:8080'
 basePath: /api
 tags:
@@ -574,7 +571,6 @@ paths:
   # MARK: - Users
       
   '/user/login':
-
     post:
       tags:
         - user
@@ -596,9 +592,25 @@ paths:
           type: string
       responses:
         '200':
-          description: succesfull login
+          description: User logged in
         '401':
-          description: unauthorized
+          description: Wrong credentials
+        '404':
+          description: User not found
+      x-swagger-router-controller: User
+      
+  '/user/logout':
+    post:
+      tags:
+        - user
+      summary: Logout
+      description: Removes user session data
+      operationId: userLogout
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User logged out
       x-swagger-router-controller: User
     
   '/user':
@@ -959,23 +971,19 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       name:
         type: string
-        example: Douglas N.
+        example: "Rick"
       lastName:
         type: string
-        example: Adams
+        example: "Riordan"
       bio:
         type: string
-        example: >-
-          Douglas Adams was born in March 1952 in Cambridge, England. He
-          attended Brentwood boarding school, where he excelled in creative
-          writing and successfully gained a place to study English Literature at
-          Cambridge University.
+        example: "Rick Riordan is the #1 New York Times bestselling author of the Percy Jackson and the Olympians series, the Kane Chronicles, and the Heroes of Olympus. He is also the author of the multi-award-winning Tres Navarre mystery series for adults. For fifteen years, Rick taught English and history at public and private middle schools in the San Francisco Bay Area and in Texas. In 2002, Saint Mary's Hall honored him with the school's first Master Teacher Award. While teaching full time, Riordan began writing mystery novels for grownups. His Tres Navarre series went on to win the top three national awards in the mystery genre - the Edgar, the Anthony and the Shamus. Riordan turned to children's fiction when he started The Lightning Thief as a bedtime story for his oldest son."
       picture:
         type: string
         format: URL
+        example: "https://s3.eu-west-3.amazonaws.com/bookstore-hypermedia-be/Images/Authors/PercyAuthor.jpg"
         
   Book:
     title: Book
@@ -998,17 +1006,18 @@ definitions:
         items:
           type: integer
           description: Author IDs
+        example: [20,22]
       ISBN:
         type: string
         format: uuid
-        example: 978-1509852796
+        example: "978-1423103349"
       title:
         type: string
-        example: The Hitchhiker's guide to the Galaxy
+        example: "Percy Jackson and the Sea of Monsters"
       genre:
         type: string
         format: Genre-enum
-        example: Science fiction
+        example: "Fantasy"
         enum:
           - Action and adventure
           - Alternate history
@@ -1059,35 +1068,24 @@ definitions:
           - Young adult
       picture:
         type: string
-        format: URL
+        format: "https://s3.eu-west-3.amazonaws.com/bookstore-hypermedia-be/Images/Books/PercyJackson.jpg"
       abstract:
         type: string
-        example: >-
-          One Thursday lunchtime the Earth gets unexpectedly demolished to make
-          way for a new hyperspace bypass. For Arthur Dent, who has only just
-          had his house demolished that morning, this seems already to be rather
-          a lot to cope with. Sadly, however, the weekend has only just begun.
-          The Galaxy may offer a mind-boggling variety of ways to be blown up
-          and/or insulted, but it's very hard to get a cup of tea.
+        example: "After a summer spent trying to prevent a catastrophic war among the Greek gods, Percy Jackson finds his seventh-grade school year unnervingly quiet. His biggest problem is dealing with his new friend, Tyson-a six-foot-three, mentally challenged homeless kid who follows Percy everywhere, making it hard for Percy to have any 'normal' friends.\n\nBut things don't stay quiet for long. Percy soon discovers there is trouble at Camp Half-Blood: the magical borders which protect Half-Blood Hill have been poisoned by a mysterious enemy, and the only safe haven for demigods is on the verge of being overrun by mythological monsters. To save the camp, Percy needs the help of his best friend, Grover, who has been taken prisoner by the Cyclops Polyphemus on an island somewhere in the Sea of Monsters, the dangerous waters Greek heroes have sailed for millennia-only today, the Sea of Monsters goes by a new name?the Bermuda Triangle.\n\nNow Percy and his friends-Grover, Annabeth, and Tyson-must retrieve the Golden Fleece from the Island of the Cyclopes by the end of the summer or Camp Half-Blood will be destroyed. But first, Percy will learn a stunning new secret about his family-one that makes him question whether being claimed as Poseidon's son is an honor or simply a cruel joke."
       releaseDate:
         type: string
         format: date
-        example: '1978-10-12'
+        example: "2007-04-01"
       factSheet:
         type: string
-        example: >-
-          First appearance  Fit the First (radio) Last appearance  And Another
-          Thing... Created by  Douglas Adams Portrayed by  Peter Jones (all save
-          for following) William Franklyn (radio series 3–5) John Lloyd (radio
-          series 6) Stephen Fry (film) Information Nickname  The Guide Origin 
-          Ursa Minor Beta
+        example: "Age Range: 10 - 14 years\nSeries: Percy Jackson and the Olympians (Book 2)\nPaperback: 320 pages\nPublisher: Disney-Hyperion; Reprint edition (April 1, 2007)\nLanguage: English\nISBN-10: 1423103343\nISBN-13: 978-1423103349"
       soldCopies:
         type: integer
-        example: 235000000
+        example: 0
       theme:
         type: string
         format: Theme-enum
-        example: Science fiction
+        example: "Good vs Evil"
         enum:
           - Love
           - Death
@@ -1101,10 +1099,10 @@ definitions:
           - War
       price:
         type: number
-        example: 10.0
+        example: 34.90
       interview:
         type: string
-        example: The author said this book tells about his childhood
+        example: "What age children did you teach?\nAll ages, but I gravitated toward kids about 11 to 14. If you are going to leave a lasting impression on children as a teacher, that is the critical time, I think.\nOne thing that struck me reading the books was that you started the series before the age of mobile technology and 24-hour distraction. Have you noticed a difference in your readers?\nWe have always been worried about things that are taking children away from reading. I’ve read newspaper articles from the 1920s going on about Dick Tracy on the radio taking kids away from books, and then it was television, and then arcade games, and now social media. I still see a huge appetite for stories. I wrote this series of books particularly for reluctant readers, but they still ask: “why was the last book only 450 pages long?”"
           
   Event:
     required:
@@ -1117,28 +1115,26 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       B_ISBN:
         type: string
-        format: uuid
-        example: 978-1509852796
+        example: "978-1982110567"
       startingDate:
         type: string
         format: date
-        example: 1978-10-12T00:00:00.000Z
+        example: "2019-06-14"
       endingDate:
         type: string
         format: date
-        example: 1978-10-12T00:00:00.000Z
+        example: "2019-07-14"
       venue:
         type: string
-        example: "Castello Sforzesco"
+        example: "Palazzo Ronaldo"
       address:
         type: string
-        example: "Via Filippo Corridoni, 22"
+        example: "Via Einstein"
       city:
         type: string
-        example: "Milano"
+        example: "Napoli"
         
   Review:
     required:
@@ -1149,25 +1145,22 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       U_ID:
         type: integer
-        example: 123
       B_ISBN:
         type: string
-        format: uuid
-        example: 978-1509852796
+        example: "978-1524797140"
       rating:
         type: integer
         format: int32
-        example: 3
+        example: 4
       description:
         type: string
-        example: 'UTTER, UTTER GENIUS.'
+        example: "Amazing! Beautiful! Best Series Ever"
       date:
         type: string
         format: date
-        example: 1978-10-13T00:00:00.000Z
+        example: "2019-05-15"
         
   ShoppingBag:
     required:
@@ -1177,20 +1170,20 @@ definitions:
     properties:
       U_ID:
         type: integer
-        example: 123
+        example: 13
       B_ISBN:
         type: string
-        format: uuid
-        example: 978-1509852796
+        example: "978-1524797140"
       quantity:
         type: integer
         format: int32
-        example: 3
+        example: 2
       version:
         type: string
         enum:
           - DIGITAL
           - PAPER
+        example: "PAPER"
         
   User:
     required:
@@ -1200,21 +1193,20 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       email:
         type: string
         format: email
-        example: pierluigi.sanpietro@mail.polimi.it
+        example: "admin@gmail.com"
       password:
         type: string
         format: password
-        example: Th1s-i5_A+zEkoOrE.Pas5w00Rd
+        example: "admin"
       name:
         type: string
-        example: Pierluigi
+        example: "Mario"
       lastName:
         type: string
-        example: Sanpietro
+        example: "Rossi"
       isAdmin:
         type: boolean
         example: false
