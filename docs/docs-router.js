@@ -31,4 +31,8 @@ router.get('/backend/app.zip', function(req, res, next) {
     res.redirect("https://github.com/antoniochiappetta/Bookstore-Hypermedia-2019---BE/archive/master.zip");
 })
 
+router.get('/frontend/app.zip', function(req, res, next) {
+    res.redirect("https://github.com/antoniochiappetta/Bookstore-Hypermedia-2019---FE/archive/master.zip");
+})
+
 module.exports = router;
