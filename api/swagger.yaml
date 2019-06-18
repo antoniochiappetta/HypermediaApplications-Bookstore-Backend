@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
   version: 1.0.0
-  title: e-Commerce Bookstore
+  title: e-Commerce Bookstore Koob
 host: 'bookstore-hypermedia-be.herokuapp.com'
 basePath: /api
 tags:
@@ -578,7 +578,7 @@ paths:
       description: Login with a form
       operationId: userLogin
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       produces:
         - application/json
       parameters:
@@ -1184,10 +1184,10 @@ definitions:
         
   UserForm:
     required:
-      - username
+      - email
       - password
     properties:
-      username:
+      email:
         type: string
         example: "admin@gmail.com"
       password:
