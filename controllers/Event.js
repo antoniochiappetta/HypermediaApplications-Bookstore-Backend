@@ -7,10 +7,10 @@ module.exports.deleteEvent = function deleteEvent (req, res, next) {
   var iD = req.swagger.params['ID'].value;
   Event.deleteEvent(iD)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
@@ -24,10 +24,10 @@ module.exports.getEvents = function getEvents (req, res, next) {
   var limit = req.swagger.params['limit'].value;
   Event.getEvents(bookISBN,iD,venue,address,city,page,limit)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
@@ -36,10 +36,10 @@ module.exports.getLatestEvents = function getLatestEvents (req, res, next) {
   var limit = req.swagger.params['limit'].value;
   Event.getLatestEvents(page,limit)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
@@ -47,9 +47,9 @@ module.exports.postEvent = function postEvent (req, res, next) {
   var event = req.swagger.params['event'].value;
   Event.postEvent(event)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
