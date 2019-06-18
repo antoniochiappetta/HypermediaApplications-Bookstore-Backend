@@ -7,10 +7,10 @@ module.exports.addAuthor = function addAuthor (req, res, next) {
   var author = req.swagger.params['Author'].value;
   Author.addAuthor(author)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
@@ -18,10 +18,10 @@ module.exports.deleteAuthor = function deleteAuthor (req, res, next) {
   var iD = req.swagger.params['ID'].value;
   Author.deleteAuthor(iD)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
@@ -29,10 +29,10 @@ module.exports.getAuthorBooks = function getAuthorBooks (req, res, next) {
   var iD = req.swagger.params['ID'].value;
   Author.getAuthorBooks(iD)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
@@ -45,10 +45,10 @@ module.exports.getAuthors = function getAuthors (req, res, next) {
   var limit = req.swagger.params['limit'].value;
   Author.getAuthors(bookISBN,iD,name,last_name,page,limit)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
@@ -57,9 +57,9 @@ module.exports.updateAuthor = function updateAuthor (req, res, next) {
   var author = req.swagger.params['Author'].value;
   Author.updateAuthor(iD,author)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
