@@ -731,7 +731,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Book'
+              $ref: '#/definitions/ShoppingBag'
         '400':
           description: bad input parameter
         '404':
