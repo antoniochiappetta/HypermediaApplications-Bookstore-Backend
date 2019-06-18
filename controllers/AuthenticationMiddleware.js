@@ -5,7 +5,8 @@
 */
 
 exports.requiresLogin = function requiresLogin(req) {
-    if (req.session) {
+    console.log(req.session.userId);
+    if (req.session.userId) {
         return {
             response: "User logged in",
             status: 200,
