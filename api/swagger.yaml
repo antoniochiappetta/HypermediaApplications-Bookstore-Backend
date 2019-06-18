@@ -582,16 +582,11 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: email
-          in: formData
-          required: true
-          type: string
-          default: "admin@gmail.com"
-        - name: password
-          in: formData
-          required: true
-          type: string
-          default: "admin"
+        - name: UserForm
+          in: body
+          description: username and password
+          schema:
+            $ref: '#/definitions/UserForm'
       responses:
         '200':
           description: User logged in
@@ -1186,6 +1181,18 @@ definitions:
           - DIGITAL
           - PAPER
         example: "PAPER"
+        
+  UserForm:
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        example: "admin@gmail.com"
+      password:
+        type: string
+        example: "admin"
         
   User:
     required:
