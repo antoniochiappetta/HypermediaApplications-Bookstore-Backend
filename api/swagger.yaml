@@ -15,7 +15,6 @@ tags:
   - name: event
     description: Operations about events
 schemes:
-  - http
   - https
   
 paths:
