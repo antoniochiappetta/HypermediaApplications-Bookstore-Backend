@@ -2,8 +2,8 @@ swagger: '2.0'
 info:
   description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
   version: 1.0.0
-  title: e-Commerce Bookstore - Local
-host: 'localhost:8080'
+  title: e-Commerce Bookstore
+host: 'localhost'
 basePath: /api
 tags:
   - name: book
