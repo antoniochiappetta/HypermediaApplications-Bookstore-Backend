@@ -136,8 +136,8 @@ module.exports.updateUser = function updateUser (req, res, next) {
 };
 
 module.exports.userLogin = function userLogin (req, res, next) {
-  var email = req.swagger.params['email'].value;
-  var password = req.swagger.params['password'].value;
+  var email = req.swagger.params['UserForm'].value.email;
+  var password = req.swagger.params['UserForm'].value.password;
   User.userLogin(email,password)
     .then(function (response) {
       if (response.status == 200) {
