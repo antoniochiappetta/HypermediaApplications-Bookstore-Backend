@@ -3,7 +3,7 @@ info:
   description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
   version: 1.0.0
   title: e-Commerce Bookstore
-host: 'localhost'
+host: 'bookstore-hypermedia-be.herokuapp.com'
 basePath: /api
 tags:
   - name: book
@@ -16,6 +16,7 @@ tags:
     description: Operations about events
 schemes:
   - http
+  - https
   
 paths:
 
