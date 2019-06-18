@@ -3,6 +3,9 @@
 let { database } = require("./DataLayer");
 let User = require("../models/user");
 let ShoppingBag = require("../models/shoppingbag");
+let Book = require("../models/book");
+
+const bcrypt = require('bcrypt');
 
 /**
  * Adds a book in the user's shopping bag
@@ -13,41 +16,49 @@ let ShoppingBag = require("../models/shoppingbag");
  * no response value expected for this operation
  **/
 exports.addToShoppingBag = function(iD,item) {
+  console.log(item)
   return database(Book.getTable)
-  .where(Book.ISBN, item.book)
+  .where(Book.isbn, item.B_ISBN)
   .count()
   .then(function(results) {
     if (results[0].count > 0) {
-      return database(User.getTable)
-      .where(User.ID, id)
-      .count()
-      .then(function(results) {
-        if (results[0].count > 0) {
-          return database.transaction(function(trx) {
-            database
-              .insert({
-                [ShoppingBag.user]: item.U_ID,
-                [ShoppingBag.book]: item.B_ISBN,
-                [ShoppingBag.quantity]: item.quantity,
-                [ShoppingBag.version]: item.version
-              })
-              .into(Review.getTable)
-              .transacting(trx)
-              .then(function() {
-                return {
-                  response: "Shopping bag item added",
-                  status: 201
-                }
-              })
-              .then(trx.commit)
-              .catch(trx.rollback)
-          })
-        } else {
-          return {
-            error: "User not found",
-            status: 404
+      return database(Book.getTable)
+      .increment(Book.soldCopies)
+      .where(Book.isbn, item.B_ISBN)
+      .then(function() {
+        console.log(item)
+        console.log(User)
+        return database(User.getTable)
+        .where(User.id, iD)
+        .count()
+        .then(function(results) {
+          if (results[0].count > 0) {
+            return database.transaction(function(trx) {
+              database
+                .insert({
+                  [ShoppingBag.user]: iD,
+                  [ShoppingBag.book]: item.B_ISBN,
+                  [ShoppingBag.quantity]: item.quantity,
+                  [ShoppingBag.version]: item.version
+                })
+                .into(ShoppingBag.getTable)
+                .transacting(trx)
+                .then(function() {
+                  return {
+                    response: "Shopping bag item added",
+                    status: 201
+                  }
+                })
+                .then(trx.commit)
+                .catch(trx.rollback)
+            })
+          } else {
+            return {
+              error: "User not found",
+              status: 404
+            }
           }
-        }
+        })
       })
     } else {
       return {
@@ -67,11 +78,13 @@ exports.addToShoppingBag = function(iD,item) {
  * no response value expected for this operation
  **/
 exports.addUser = function(user) {
+  // Encrypt password
+  let hashedPassword = bcrypt.hashSync(user.password, 10);
   return database.transaction(function(trx) {
     database
       .insert({
         [User.email]: user.email,
-        [User.password]: user.password,
+        [User.password]: hashedPassword,
         [User.name]: user.name,
         [User.lastName]: user.lastName,
         [User.isAdmin]: user.isAdmin
@@ -205,6 +218,7 @@ exports.getInfo = function(iD) {
  * returns List
  **/
 exports.getShoppingBag = function(iD,page,limit) {
+  console.log(iD)
   return database(ShoppingBag.getTable)
     .where(ShoppingBag.user, iD)
     .limit(limit ? limit: 100)
@@ -230,17 +244,20 @@ exports.getShoppingBag = function(iD,page,limit) {
  **/
 exports.updateShoppingBag = function(iD,iSBN,item) {
   return database(ShoppingBag.getTable)
-    .where(ShoppingBag.id, iD)
+    .where(ShoppingBag.user, iD)
     .count()
     .then(function(results) {
       if (results[0].count > 0) {
         return database(Book.getTable)
-        .where(Book.iD, iSBN)
+        .where(Book.isbn, iSBN)
         .count()
         .then(function(results) {
           if (results[0].count > 0) {
             return database(ShoppingBag.getTable)
-            .where(ShoppingBag.user, iD)
+            .where({
+              [ShoppingBag.user]: item.U_ID,
+              [ShoppingBag.book]: item.B_ISBN
+            })
             .update({
               [ShoppingBag.user]: item.U_ID,
               [ShoppingBag.book]: item.B_ISBN,
@@ -318,6 +335,49 @@ exports.updateUser = function(iD,user) {
  * no response value expected for this operation
  **/
 exports.userLogin = function(email,password) {
-  // TODO empty
+  return database(User.getTable)
+  .where(User.email, email)
+  .then(function(results) {
+    if (results.length > 0) {
+      let user = results[0]
+      console.log(user);
+      // Compare sent password with hashed password on the db
+      if(bcrypt.compareSync(password, user.password)) {
+        // Passwords match, store user in session
+        return {
+          response: "User logged in",
+          userId: user.ID,
+          status: 200
+        }
+       } else {
+        // Passwords don't match
+        return {
+          error: "Wrong credentials",
+          status: 401
+        }
+       }
+    } else {
+      return {
+        error: "User not found",
+        status: 404
+      }
+    }
+  })
+}
+
+/**
+ * Logout
+ * Removes user session data
+ *
+ * no response value expected for this operation
+ **/
+exports.userLogout = function() {
+  return new Promise(function(resolve, reject) {
+    let response = {
+      response: "User logged out",
+      status: 200
+    }
+    resolve(response);
+  });
 }
 

@@ -6,6 +6,8 @@ let Book = require("../models/book");
 let WrittenBy = require("../models/writtenby");
 let Review = require("../models/review");
 let User = require("../models/user");
+let ShoppingBag = require("../models/shoppingbag");
+let Author = require("../models/author");
 
 /**
  * Adds a book
@@ -18,6 +20,7 @@ exports.addBook = function(book) {
   let isAuthorized = true // TODO
   if (isAuthorized) {
     return database.transaction(function(trx) {
+      console.log(book)
       database
         .insert({
           [Book.isbn]: book.ISBN,
@@ -28,12 +31,12 @@ exports.addBook = function(book) {
           [Book.releaseDate]: book.releaseDate,
           [Book.title]: book.title,
           [Book.theme]: book.theme,
-          [Book.price]: book.price
+          [Book.price]: book.price,
+          [Book.interview]: book.interview
         })
         .into(Book.getTable)
         .transacting(trx)
         .then(function(_ids) {
-          console.log(book.authors)
           return Promise.map(book.authors, function(authorId) {
             console.log(authorId)
             return database
@@ -136,6 +139,50 @@ exports.deleteReview = function(iD) {
 
 
 /**
+ * Get a list of best sellers
+ * All the books ordered according to their number of sold copies (i.e. times posted in a shopping bag)
+ *
+ * returns List
+ **/
+exports.getBestSellers = function() {
+  return database(Book.getTable)
+  .orderBy(Book.soldCopies, "desc")
+  .limit(10)
+  .then(function(results) {
+    return {
+      message: "Books",
+      content: results,
+      status: 200
+    }
+  })
+}
+
+/**
+ * Return the authors of the book
+ * Return the authors of the book
+ *
+ * iSBN String ISBN of the book
+ * returns List
+ **/
+exports.getBookAuthors = function(iSBN) {
+  return database(Author.getTable)
+  .whereIn(Author.id, function() {
+    this
+      .select(WrittenBy.author)
+      .from(WrittenBy.getTable)
+      .where(WrittenBy.book, iSBN)
+  })
+  .then(function(results) {
+    return {
+      message: "Authors",
+      content: results,
+      status: 200
+    }
+  })
+}
+
+
+/**
  * Returns the Books
  * By passing in the appropriate options, you can search for available inventory in the system
  *
@@ -148,7 +195,7 @@ exports.deleteReview = function(iD) {
  * limit Integer Maximum number of records to return (optional)
  * returns List
  **/
-exports.getBooks = function(iSBN,author,title,release_date,order_type,page,limit) {
+exports.getBooks = function(iSBN,author,title,release_date,genre,theme,order_type,page,limit) {
   return database(Book.getTable)
   .modify(function(queryBuilder) {
     if (iSBN)
@@ -159,6 +206,10 @@ exports.getBooks = function(iSBN,author,title,release_date,order_type,page,limit
       queryBuilder.where(Book.title, title)
     if (release_date)
       queryBuilder.where(Book.releaseDate, release_date)
+    if (genre)
+      queryBuilder.where(Book.genre, genre)
+    if (theme)
+      queryBuilder.where(Book.theme, theme)
     if (order_type) {
       switch (order_type) {
         case Book.orderType.soldCopies:
@@ -191,6 +242,98 @@ exports.getBooks = function(iSBN,author,title,release_date,order_type,page,limit
 
 
 /**
+ * Get a list of favourite readings
+ * All the books ordered according to their presence in users' shopping bags
+ *
+ * returns List
+ **/
+exports.getFavouriteReadings = function() {
+  return database(ShoppingBag.getTable)
+  .select(ShoppingBag.book)
+  .groupBy(ShoppingBag.book)
+  .count()
+  .orderBy('count', 'desc')
+  .map(function(row) {
+    return database(Book.getTable)
+    .where(Book.isbn, row.B_ISBN)
+  })
+  .then(function(results) {
+    return {
+      message: "Books",
+      content: results,
+      status: 200
+    }
+  })
+}
+
+
+/**
+ * Get list of genres
+ * Get list of genres
+ *
+ * returns List
+ **/
+exports.getGenres = function() {
+  return database(Book.getTable)
+  .then(function() {
+    return {
+      message: "Genres",
+      content: [
+        "Action and adventure",
+        "Alternate history",
+        "Anthology",
+        "Art",
+        "Autobiography",
+        "Biography",
+        "Book review",
+        "Chick lit",
+        "Children's literature",
+        "Cookbook",
+        "Comic book",
+        "Coming-of-age",
+        "Crime",
+        "Diary",
+        "Dictionary",
+        "Drama",
+        "Encyclopedia",
+        "Fairytale",
+        "Fantasy",
+        "Guide",
+        "Graphic novel",
+        "Health",
+        "History",
+        "Historical fiction",
+        "Horror",
+        "Journal",
+        "Math",
+        "Memoir",
+        "Mystery",
+        "Paranormal romance",
+        "Picture book",
+        "Poetry",
+        "Political thriller",
+        "Prayer",
+        "Religion, spirituality, and new age",
+        "Review",
+        "Romance",
+        "Satire",
+        "Science",
+        "Science fiction",
+        "Self help",
+        "Short story",
+        "Suspense",
+        "Thriller",
+        "Travel",
+        "True crime",
+        "Young adult"
+      ],
+      status: 200
+    }
+  })
+}
+
+
+/**
  * Returns all the book similar to a book
  * Returns all the book similar to the book with the ISBN passed
  *
@@ -214,27 +357,58 @@ exports.getReviews = function(iSBN,page,limit) {
 
 
 /**
+ * Get list of themes
+ * Get list of themes
+ *
+ * returns List
+ **/
+exports.getThemes = function() {
+  return database(Book.getTable)
+  .then(function() {
+    return {
+      message: "Themes",
+      content: [
+        "Love",
+        "Death",
+        "Good vs Evil",
+        "Coming of Age",
+        "Power and Corruption",
+        "Survival",
+        "Courage and Heroism",
+        "Prejudice",
+        "Individual vs Society",
+        "War"
+      ],
+      status: 200
+    }
+  })
+}
+
+
+/**
  * Post a review
  * Post a review to the system
  *
  * review Review a Review (optional)
  * no response value expected for this operation
  **/
-exports.postReview = function(review) {
+exports.postReview = function(iD,review) {
   return database(Book.getTable)
-  .where(Book.ISBN, review.book)
+  .where(Book.isbn, review.B_ISBN)
   .count()
   .then(function(results) {
     if (results[0].count > 0) {
       return database(User.getTable)
-      .where(User.ID, review.user)
+      .where(User.id, iD)
       .count()
       .then(function(results) {
         if (results[0].count > 0) {
+          console.log(iD)
+          console.log(review)
           return database.transaction(function(trx) {
             database
               .insert({
-                [Review.user]: review.U_ID,
+                [Review.user]: iD,
                 [Review.book]: review.B_ISBN,
                 [Review.date]: review.date,
                 [Review.description]: review.description,
@@ -342,7 +516,8 @@ exports.updateBook = function(iSBN,book) {
           [Book.releaseDate]: book.releaseDate,
           [Book.title]: book.title,
           [Book.theme]: book.theme,
-          [Book.price]: book.price
+          [Book.price]: book.price,
+          [Book.interview]: book.interview
         })
         .then(function() {
           return {

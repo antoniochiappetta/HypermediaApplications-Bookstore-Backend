@@ -3,10 +3,7 @@ info:
   description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
   version: 1.0.0
   title: e-Commerce Bookstore
-  license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-host: 'localhost:8080'
+host: 'bookstore-hypermedia-be.herokuapp.com'
 basePath: /api
 tags:
   - name: book
@@ -18,7 +15,7 @@ tags:
   - name: event
     description: Operations about events
 schemes:
-  - http
+  - https
   
 paths:
 
@@ -57,6 +54,16 @@ paths:
           required: false
           type: string
           format: date
+        - name: genre
+          in: query
+          description: Genre
+          required: false
+          type: string
+        - name: theme
+          in: query
+          description: Theme
+          required: false
+          type: string
         - name: order_type
           in: query
           description: Pass an optional order in which receive the list of books (default
@@ -166,6 +173,32 @@ paths:
           description: 'invalid input, book doesn''t exist'
         '403':
           description: Operation not allowed
+        '404':
+          description: item not found
+      x-swagger-router-controller: Book
+      
+  '/books/{ISBN}/authors':
+    get:
+      tags:
+        - book
+      summary: Return the authors of the book
+      description: Return the authors of the book
+      operationId: getBookAuthors
+      parameters:
+        - name: ISBN
+          in: path
+          type: string
+          required: true
+          description: ISBN of the book
+      responses:
+        '200':
+          description: Authors of the book
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Author'
+        '400':
+          description: invalid input
         '404':
           description: item not found
       x-swagger-router-controller: Book
@@ -295,7 +328,80 @@ paths:
           description: 'invalid input, object invalid'
         '404':
           description: user not found
-    x-swagger-router-controller: Book
+      x-swagger-router-controller: Book
+    
+  '/books/genres':
+    get:
+      tags:
+        - book
+      summary: Get list of genres
+      operationId: getGenres
+      description: Get list of genres
+      responses:
+        '200':
+          description: Genres list
+          schema:
+            type: array
+            items:
+              type: string
+        '400':
+          description: invalid input
+      x-swagger-router-controller: Book
+    
+  '/books/themes':
+    get:
+      tags:
+        - book
+      summary: Get list of themes
+      operationId: getThemes
+      description: Get list of themes
+      responses:
+        '200':
+          description: Themes list
+          schema:
+            type: array
+            items:
+              type: string
+        '400':
+          description: invalid input
+      x-swagger-router-controller: Book
+      
+  '/books/favouriteReadings':
+    get:
+      tags:
+        - book
+      summary: Get a list of favourite readings
+      operationId: getFavouriteReadings
+      description: All the books ordered according to their presence in users' shopping bags
+      responses:
+        '200':
+          description: Favourite readings
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Book'
+        '400':
+          description: invalid input
+      x-swagger-router-controller: Book
+      
+  '/books/bestSellers':
+    get:
+      tags:
+        - book
+      summary: Get a list of best sellers
+      operationId: getBestSellers
+      description: All the books ordered according to their number of sold copies (i.e. times posted in a shopping bag)
+      responses:
+        '200':
+          description: Favourite readings
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Book'
+        '400':
+          description: invalid input
+      x-swagger-router-controller: Book
+        
     
   # MARK: - Authors  
     
@@ -436,7 +542,78 @@ paths:
           description: author not found
     x-swagger-router-controller: Author
     
+  '/authors/{ID}/books':
+    get:
+      tags:
+        - author
+      summary: Return the books of the author
+      description: Return the books of the authors
+      operationId: getAuthorBooks
+      parameters:
+        - name: ID
+          in: path
+          type: string
+          required: true
+          description: ID of the author
+      responses:
+        '200':
+          description: Books of the author
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Book'
+        '400':
+          description: invalid input
+        '404':
+          description: item not found
+      x-swagger-router-controller: Author
+    
   # MARK: - Users
+      
+  '/user/login':
+    post:
+      tags:
+        - user
+      summary: Login
+      description: Login with a form
+      operationId: userLogin
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: formData
+          required: true
+          type: string
+          default: "admin@gmail.com"
+        - name: password
+          in: formData
+          required: true
+          type: string
+          default: "admin"
+      responses:
+        '200':
+          description: User logged in
+        '401':
+          description: Wrong credentials
+        '404':
+          description: User not found
+      x-swagger-router-controller: User
+      
+  '/user/logout':
+    post:
+      tags:
+        - user
+      summary: Logout
+      description: Removes user session data
+      operationId: userLogout
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User logged out
+      x-swagger-router-controller: User
     
   '/user':
     post:
@@ -463,51 +640,15 @@ paths:
         '409':
           description: an existing item already exists
       x-swagger-router-controller: User
-      
-  '/user/login':
-
-    post:
-      tags:
-        - user
-      summary: Login
-      description: Login with a form
-      operationId: userLogin
-      consumes:
-        - application/x-www-form-urlencoded
-      produces:
-        - application/json
-      parameters:
-        - name: email
-          in: formData
-          required: true
-          type: string
-        - name: password
-          in: formData
-          required: true
-          type: string
-      responses:
-        '200':
-          description: succesfull login
-        '401':
-          description: unauthorized
-      x-swagger-router-controller: User
-  
-  '/user/{ID}':
   
     get:
       tags:
         - user
-      summary: Returns the personal info of the user
-      description: Returns the personal info of the user which Id is passed
+      summary: Returns the personal info of the logged user
+      description: Returns the personal info of the logged user
       operationId: getInfo
       produces:
         - application/json
-      parameters:
-        - name: ID
-          in: path
-          type: string
-          required: true
-          description: ID of the user
       responses:
         '200':
           description: Search info
@@ -524,19 +665,14 @@ paths:
     put:
       tags:
         - user
-      summary: update a user
+      summary: Update information about the currently logged user
+      description: Update information about the currently logged user
       operationId: updateUser
-      description: Update user checking which field is different
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          type: string
-          required: true
-          description: ID of the user
         - name: User
           in: body
           description: a User updated
@@ -554,14 +690,9 @@ paths:
     delete:
       tags:
         - user
-      summary: delete a user
+      summary: Delete the currently logged user
+      description: Delete the currently logged user
       operationId: deleteUser
-      description: Delete a user from the system
-      parameters:
-        - name: ID
-          in: path
-          type: string
-          required: true
       responses:
         '201':
           description: item deleted
@@ -571,7 +702,7 @@ paths:
           description: user not found
     x-swagger-router-controller: User
       
-  '/user/{ID}/shoppingBag':
+  '/user/shoppingBag':
   
     get:
       tags:
@@ -582,11 +713,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations are searched
-          required: true
-          type: string
         - name: page
           in: query
           description: Number of the page
@@ -605,7 +731,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Book'
+              $ref: '#/definitions/ShoppingBag'
         '400':
           description: bad input parameter
         '404':
@@ -623,11 +749,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations list is searched
-          required: true
-          type: string
         - name: item
           in: body
           description: a Shopping Bag item
@@ -642,7 +763,7 @@ paths:
           description: item not found
       x-swagger-router-controller: User
       
-  '/user/{ID}/shoppingBag/{ISBN}':
+  '/user/shoppingBag/{ISBN}':
   
     put:
       tags:
@@ -655,11 +776,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations list is searched
-          required: true
-          type: string
         - name: ISBN
           in: path
           description: Book ISBN
@@ -690,11 +806,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ID
-          in: path
-          description: User which reservations list is searched
-          required: true
-          type: string
         - name: ISBN
           in: path
           description: Book ISBN
@@ -862,23 +973,19 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       name:
         type: string
-        example: Douglas N.
+        example: "Rick"
       lastName:
         type: string
-        example: Adams
+        example: "Riordan"
       bio:
         type: string
-        example: >-
-          Douglas Adams was born in March 1952 in Cambridge, England. He
-          attended Brentwood boarding school, where he excelled in creative
-          writing and successfully gained a place to study English Literature at
-          Cambridge University.
+        example: "Rick Riordan is the #1 New York Times bestselling author of the Percy Jackson and the Olympians series, the Kane Chronicles, and the Heroes of Olympus. He is also the author of the multi-award-winning Tres Navarre mystery series for adults. For fifteen years, Rick taught English and history at public and private middle schools in the San Francisco Bay Area and in Texas. In 2002, Saint Mary's Hall honored him with the school's first Master Teacher Award. While teaching full time, Riordan began writing mystery novels for grownups. His Tres Navarre series went on to win the top three national awards in the mystery genre - the Edgar, the Anthony and the Shamus. Riordan turned to children's fiction when he started The Lightning Thief as a bedtime story for his oldest son."
       picture:
         type: string
         format: URL
+        example: "https://s3.eu-west-3.amazonaws.com/bookstore-hypermedia-be/Images/Authors/PercyAuthor.jpg"
         
   Book:
     title: Book
@@ -894,23 +1001,25 @@ definitions:
       - factSheet
       - theme
       - price
+      - interview
     properties:
       authors:
         type: array
         items:
           type: integer
           description: Author IDs
+        example: [20,22]
       ISBN:
         type: string
         format: uuid
-        example: 978-1509852796
+        example: "978-1423103349"
       title:
         type: string
-        example: The Hitchhiker's guide to the Galaxy
+        example: "Percy Jackson and the Sea of Monsters"
       genre:
         type: string
         format: Genre-enum
-        example: Science fiction
+        example: "Fantasy"
         enum:
           - Action and adventure
           - Alternate history
@@ -961,35 +1070,24 @@ definitions:
           - Young adult
       picture:
         type: string
-        format: URL
+        format: "https://s3.eu-west-3.amazonaws.com/bookstore-hypermedia-be/Images/Books/PercyJackson.jpg"
       abstract:
         type: string
-        example: >-
-          One Thursday lunchtime the Earth gets unexpectedly demolished to make
-          way for a new hyperspace bypass. For Arthur Dent, who has only just
-          had his house demolished that morning, this seems already to be rather
-          a lot to cope with. Sadly, however, the weekend has only just begun.
-          The Galaxy may offer a mind-boggling variety of ways to be blown up
-          and/or insulted, but it's very hard to get a cup of tea.
+        example: "After a summer spent trying to prevent a catastrophic war among the Greek gods, Percy Jackson finds his seventh-grade school year unnervingly quiet. His biggest problem is dealing with his new friend, Tyson-a six-foot-three, mentally challenged homeless kid who follows Percy everywhere, making it hard for Percy to have any 'normal' friends.\n\nBut things don't stay quiet for long. Percy soon discovers there is trouble at Camp Half-Blood: the magical borders which protect Half-Blood Hill have been poisoned by a mysterious enemy, and the only safe haven for demigods is on the verge of being overrun by mythological monsters. To save the camp, Percy needs the help of his best friend, Grover, who has been taken prisoner by the Cyclops Polyphemus on an island somewhere in the Sea of Monsters, the dangerous waters Greek heroes have sailed for millennia-only today, the Sea of Monsters goes by a new name?the Bermuda Triangle.\n\nNow Percy and his friends-Grover, Annabeth, and Tyson-must retrieve the Golden Fleece from the Island of the Cyclopes by the end of the summer or Camp Half-Blood will be destroyed. But first, Percy will learn a stunning new secret about his family-one that makes him question whether being claimed as Poseidon's son is an honor or simply a cruel joke."
       releaseDate:
         type: string
         format: date
-        example: '1978-10-12'
+        example: "2007-04-01"
       factSheet:
         type: string
-        example: >-
-          First appearance  Fit the First (radio) Last appearance  And Another
-          Thing... Created by  Douglas Adams Portrayed by  Peter Jones (all save
-          for following) William Franklyn (radio series 3–5) John Lloyd (radio
-          series 6) Stephen Fry (film) Information Nickname  The Guide Origin 
-          Ursa Minor Beta
+        example: "Age Range: 10 - 14 years\nSeries: Percy Jackson and the Olympians (Book 2)\nPaperback: 320 pages\nPublisher: Disney-Hyperion; Reprint edition (April 1, 2007)\nLanguage: English\nISBN-10: 1423103343\nISBN-13: 978-1423103349"
       soldCopies:
         type: integer
-        example: 235000000
+        example: 0
       theme:
         type: string
         format: Theme-enum
-        example: Science fiction
+        example: "Good vs Evil"
         enum:
           - Love
           - Death
@@ -1003,7 +1101,10 @@ definitions:
           - War
       price:
         type: number
-        example: 10.0
+        example: 34.90
+      interview:
+        type: string
+        example: "What age children did you teach?\nAll ages, but I gravitated toward kids about 11 to 14. If you are going to leave a lasting impression on children as a teacher, that is the critical time, I think.\nOne thing that struck me reading the books was that you started the series before the age of mobile technology and 24-hour distraction. Have you noticed a difference in your readers?\nWe have always been worried about things that are taking children away from reading. I’ve read newspaper articles from the 1920s going on about Dick Tracy on the radio taking kids away from books, and then it was television, and then arcade games, and now social media. I still see a huge appetite for stories. I wrote this series of books particularly for reluctant readers, but they still ask: “why was the last book only 450 pages long?”"
           
   Event:
     required:
@@ -1016,32 +1117,29 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       B_ISBN:
         type: string
-        format: uuid
-        example: 978-1509852796
+        example: "978-1982110567"
       startingDate:
         type: string
         format: date
-        example: 1978-10-12T00:00:00.000Z
+        example: "2019-06-14"
       endingDate:
         type: string
         format: date
-        example: 1978-10-12T00:00:00.000Z
+        example: "2019-07-14"
       venue:
         type: string
-        example: "Castello Sforzesco"
+        example: "Palazzo Ronaldo"
       address:
         type: string
-        example: "Via Filippo Corridoni, 22"
+        example: "Via Einstein"
       city:
         type: string
-        example: "Milano"
+        example: "Napoli"
         
   Review:
     required:
-      - U_ID
       - B_ISBN
       - rating
       - description
@@ -1049,49 +1147,45 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       U_ID:
         type: integer
-        example: 123
       B_ISBN:
         type: string
-        format: uuid
-        example: 978-1509852796
+        example: "978-1524797140"
       rating:
         type: integer
         format: int32
-        example: 3
+        example: 4
       description:
         type: string
-        example: 'UTTER, UTTER GENIUS.'
+        example: "Amazing! Beautiful! Best Series Ever"
       date:
         type: string
         format: date
-        example: 1978-10-13T00:00:00.000Z
+        example: "2019-05-15"
         
   ShoppingBag:
     required:
-      - U_ID
       - B_ISBN
       - quantity
       - version
     properties:
       U_ID:
         type: integer
-        example: 123
+        example: 13
       B_ISBN:
         type: string
-        format: uuid
-        example: 978-1509852796
+        example: "978-1524797140"
       quantity:
         type: integer
         format: int32
-        example: 3
+        example: 2
       version:
         type: string
         enum:
           - DIGITAL
           - PAPER
+        example: "PAPER"
         
   User:
     required:
@@ -1101,21 +1195,20 @@ definitions:
     properties:
       ID:
         type: integer
-        example: 123
       email:
         type: string
         format: email
-        example: pierluigi.sanpietro@mail.polimi.it
+        example: "admin@gmail.com"
       password:
         type: string
         format: password
-        example: Th1s-i5_A+zEkoOrE.Pas5w00Rd
+        example: "admin"
       name:
         type: string
-        example: Pierluigi
+        example: "Mario"
       lastName:
         type: string
-        example: Sanpietro
+        example: "Rossi"
       isAdmin:
         type: boolean
         example: false

@@ -2,100 +2,137 @@
 
 var utils = require('../utils/writer.js');
 var User = require('../service/UserService');
+var Auth = require('./AuthenticationMiddleware');
 
 module.exports.addToShoppingBag = function addToShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  var item = req.swagger.params['item'].value;
-  User.addToShoppingBag(iD,item)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    var item = req.swagger.params['item'].value;
+    User.addToShoppingBag(iD,item)
+      .then(function (response) {
+        utils.writeJson(res, response, response.status);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response, response.status);
+      });
+  }
 };
 
 module.exports.addUser = function addUser (req, res, next) {
   var user = req.swagger.params['User'].value;
   User.addUser(user)
     .then(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
     });
 };
 
 module.exports.deleteFromShoppingBag = function deleteFromShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  var iSBN = req.swagger.params['ISBN'].value;
-  User.deleteFromShoppingBag(iD,iSBN)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    var iSBN = req.swagger.params['ISBN'].value;
+    User.deleteFromShoppingBag(iD,iSBN)
+      .then(function (response) {
+        utils.writeJson(res, response, response.status);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response, response.status);
+      });
+  }
 };
 
 module.exports.deleteUser = function deleteUser (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  User.deleteUser(iD)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    User.deleteUser(iD)
+      .then(function (response) {
+        utils.writeJson(res, response, response.status);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response, response.status);
+      });
+  }
 };
 
 module.exports.getInfo = function getInfo (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  User.getInfo(iD)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    User.getInfo(iD)
+      .then(function (response) {
+        utils.writeJson(res, response, response.status);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response, response.status);
+      });
+  }
+
 };
 
 module.exports.getShoppingBag = function getShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  var page = req.swagger.params['page'].value;
-  var limit = req.swagger.params['limit'].value;
-  User.getShoppingBag(iD,page,limit)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    var page = req.swagger.params['page'].value;
+    var limit = req.swagger.params['limit'].value;
+    User.getShoppingBag(iD,page,limit)
+      .then(function (response) {
+        utils.writeJson(res, response, response.status);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response, response.status);
+      });
+  }
 };
 
 module.exports.updateShoppingBag = function updateShoppingBag (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  var iSBN = req.swagger.params['ISBN'].value;
-  var item = req.swagger.params['item'].value;
-  User.updateShoppingBag(iD,iSBN,item)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    var iSBN = req.swagger.params['ISBN'].value;
+    var item = req.swagger.params['item'].value;
+    User.updateShoppingBag(iD,iSBN,item)
+      .then(function (response) {
+        utils.writeJson(res, response, response.status);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response, response.status);
+      });
+  }
 };
 
 module.exports.updateUser = function updateUser (req, res, next) {
-  var iD = req.swagger.params['ID'].value;
-  var user = req.swagger.params['User'].value;
-  User.updateUser(iD,user)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  const authResponse = Auth.requiresLogin(req);
+  if (authResponse.status == 401) {
+    utils.writeJson(res, authResponse);
+  } else {
+    var iD = authResponse.userId;
+    var user = req.swagger.params['User'].value;
+    User.updateUser(iD,user)
+      .then(function (response) {
+        utils.writeJson(res, response, response.status);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response, response.status);
+      });
+  }
 };
 
 module.exports.userLogin = function userLogin (req, res, next) {
@@ -103,9 +140,23 @@ module.exports.userLogin = function userLogin (req, res, next) {
   var password = req.swagger.params['password'].value;
   User.userLogin(email,password)
     .then(function (response) {
-      utils.writeJson(res, response);
+      if (response.status == 200) {
+        req.session.userId = response.userId;
+      }
+      utils.writeJson(res, response, response.status);
     })
     .catch(function (response) {
-      utils.writeJson(res, response);
+      utils.writeJson(res, response, response.status);
+    });
+};
+
+module.exports.userLogout = function userLogout (req, res, next) {
+  User.userLogout()
+    .then(function (response) {
+      req.session = null;
+      utils.writeJson(res, response, response.status);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response, response.status);
     });
 };

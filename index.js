@@ -4,15 +4,17 @@ var fs = require("fs"),
   path = require("path"),
   http = require("http");
 
-var app = require("connect")();
+const express = require("express")
+var app = express();
 var swaggerTools = require("swagger-tools");
 var jsyaml = require("js-yaml");
 var serverPort = process.env.PORT || 8080;
 let cookieSession = require("cookie-session");
 let cookieParser = require("cookie-parser");
-let serveStatic = require("serve-static");
+var cors = require('cors');
 
 let { setupDataLayer } = require("./service/DataLayer");
+var docsRouter = require("./docs/docs-router");
 
 // swaggerRouter configuration
 var options = {
@@ -25,9 +27,15 @@ var options = {
 var spec = fs.readFileSync(path.join(__dirname, "api/swagger.yaml"), "utf8");
 var swaggerDoc = jsyaml.safeLoad(spec);
 
+// CORS policy
+app.use(cors({origin: 'https://bookstore-hypermedia-fe.herokuapp.com', credentials: true}));
+
 // Add cookies to responses
 app.use(cookieParser());
 app.use(cookieSession({ name: "session", keys: ["abc", "def"] }));
+
+// Documentation
+app.use('/', docsRouter);
 
 // Initialize the Swagger middleware
 swaggerTools.initializeMiddleware(swaggerDoc, function(middleware) {
@@ -42,28 +50,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, function(middleware) {
 
   // Serve the Swagger documents and Swagger UI
   app.use(middleware.swaggerUi());
-
-  app.use(serveStatic(__dirname + "/www"));
-
-  // Add headers
-  app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
-  });
 
   setupDataLayer().then((res, err) => {
     if (err) {
