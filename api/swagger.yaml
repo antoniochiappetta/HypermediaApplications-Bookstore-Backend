@@ -586,10 +586,12 @@ paths:
           in: formData
           required: true
           type: string
+          default: "admin@gmail.com"
         - name: password
           in: formData
           required: true
           type: string
+          default: "admin"
       responses:
         '200':
           description: User logged in
