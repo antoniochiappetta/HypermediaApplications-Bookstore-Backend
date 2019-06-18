@@ -2,8 +2,8 @@ swagger: '2.0'
 info:
   description: This is Chiappetta-Gulli-Marabelli e-Commerce Bookstore
   version: 1.0.0
-  title: e-Commerce Bookstore - Local
-host: 'localhost:8080'
+  title: e-Commerce Bookstore
+host: 'bookstore-hypermedia-be.herokuapp.com'
 basePath: /api
 tags:
   - name: book
@@ -15,7 +15,7 @@ tags:
   - name: event
     description: Operations about events
 schemes:
-  - http
+  - https
   
 paths:
 
@@ -586,10 +586,12 @@ paths:
           in: formData
           required: true
           type: string
+          default: "admin@gmail.com"
         - name: password
           in: formData
           required: true
           type: string
+          default: "admin"
       responses:
         '200':
           description: User logged in
@@ -729,7 +731,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Book'
+              $ref: '#/definitions/ShoppingBag'
         '400':
           description: bad input parameter
         '404':
