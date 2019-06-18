@@ -578,7 +578,7 @@ paths:
       description: Login with a form
       operationId: userLogin
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       produces:
         - application/json
       parameters:
@@ -1184,10 +1184,10 @@ definitions:
         
   UserForm:
     required:
-      - username
+      - email
       - password
     properties:
-      username:
+      email:
         type: string
         example: "admin@gmail.com"
       password:
